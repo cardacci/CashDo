@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
 import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
-import { TASK_TEXT_MAX_LENGTH } from '../constants';
+import { CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
 import { Priority } from '../types';
 
 /* ===== Constants ===== */
+
 const PRIORITIES: Priority[] = [Priority.High, Priority.Medium, Priority.Low];
 
 const PRIORITY_LABELS: Record<Priority, string> = {
@@ -27,6 +28,9 @@ export function TaskInput() {
 	/* ===== Derived Values ===== */
 	const theme = darkMode ? darkTheme : lightTheme;
 	const dynamicStyles = createDynamicStyles(theme);
+	const charRatio = text.length / TASK_TEXT_MAX_LENGTH;
+	const showCharCount = charRatio >= CHAR_COUNT.WARNING_THRESHOLD;
+	const charCountColor = charRatio >= CHAR_COUNT.DANGER_THRESHOLD ? theme.danger : theme.textSecondary;
 
 	/* ===== Functions ===== */
 	function getPriorityColor(p: Priority): string {
@@ -66,6 +70,10 @@ export function TaskInput() {
 				value={text}
 			/>
 
+			<Text style={[styles.charCount, { color: charCountColor, fontFamily: fonts.body, opacity: showCharCount ? 1 : 0 }]}>
+				{text.length}/{TASK_TEXT_MAX_LENGTH}
+			</Text>
+
 			<View style={styles.priorityRow}>
 				{PRIORITIES.map((p) => (
 					<Pressable
@@ -101,13 +109,10 @@ function createDynamicStyles(theme: ThemeColors) {
 		container: {
 			backgroundColor: theme.surface,
 			borderRadius: 12,
+			boxShadow: `0 2px 8px ${theme.cardShadow}`,
 			elevation: 2,
 			marginBottom: 16,
-			padding: 16,
-			shadowColor: theme.cardShadow,
-			shadowOffset: { height: 2, width: 0 },
-			shadowOpacity: 1,
-			shadowRadius: 8
+			padding: 16
 		},
 		input: {
 			backgroundColor: theme.inputBackground,
@@ -116,7 +121,6 @@ function createDynamicStyles(theme: ThemeColors) {
 			borderWidth: 1,
 			color: theme.text,
 			fontSize: 15,
-			marginBottom: 12,
 			paddingHorizontal: 14,
 			paddingVertical: 12
 		}
@@ -130,6 +134,12 @@ const styles = StyleSheet.create({
 	addButtonText: {
 		fontSize: 15,
 		letterSpacing: 0.3
+	},
+	charCount: {
+		fontSize: CHAR_COUNT.FONT_SIZE,
+		marginBottom: 4,
+		marginTop: 2,
+		textAlign: 'right'
 	},
 	priorityButton: {
 		borderRadius: 8,

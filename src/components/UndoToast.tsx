@@ -1,13 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
-import {
-	TOAST_ANIMATION_DURATION,
-	TOAST_AUTO_DISMISS_DURATION,
-	TOAST_BOTTOM_OFFSET,
-	TOAST_MESSAGE_DELETED,
-	TOAST_TRANSLATE_Y_HIDDEN,
-	TOAST_UNDO_LABEL
-} from '../constants';
+import { TOAST } from '../constants';
 import { useTaskStore } from '../store/useTaskStore';
 import { useUndoStore } from '../store/useUndoStore';
 import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
@@ -35,7 +28,7 @@ export function UndoToast() {
 
 	/* ===== Refs ===== */
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const translateY = useRef(new Animated.Value(TOAST_TRANSLATE_Y_HIDDEN)).current;
+	const translateY = useRef(new Animated.Value(TOAST.TRANSLATE_Y_HIDDEN)).current;
 
 	/* ===== Derived Values ===== */
 	const theme = darkMode ? darkTheme : lightTheme;
@@ -53,8 +46,8 @@ export function UndoToast() {
 		clearTimer();
 
 		Animated.timing(translateY, {
-			duration: TOAST_ANIMATION_DURATION,
-			toValue: TOAST_TRANSLATE_Y_HIDDEN,
+			duration: TOAST.ANIMATION_DURATION,
+			toValue: TOAST.TRANSLATE_Y_HIDDEN,
 			useNativeDriver: true
 		}).start(() => {
 			clearPendingDelete();
@@ -69,8 +62,8 @@ export function UndoToast() {
 		}
 
 		Animated.timing(translateY, {
-			duration: TOAST_ANIMATION_DURATION,
-			toValue: TOAST_TRANSLATE_Y_HIDDEN,
+			duration: TOAST.ANIMATION_DURATION,
+			toValue: TOAST.TRANSLATE_Y_HIDDEN,
 			useNativeDriver: true
 		}).start(() => {
 			clearPendingDelete();
@@ -81,13 +74,13 @@ export function UndoToast() {
 	useEffect(() => {
 		if (pendingDelete) {
 			Animated.timing(translateY, {
-				duration: TOAST_ANIMATION_DURATION,
+				duration: TOAST.ANIMATION_DURATION,
 				toValue: 0,
 				useNativeDriver: true
 			}).start();
 
 			clearTimer();
-			timerRef.current = setTimeout(handleDismiss, TOAST_AUTO_DISMISS_DURATION);
+			timerRef.current = setTimeout(handleDismiss, TOAST.AUTO_DISMISS_DURATION);
 		}
 
 		return clearTimer;
@@ -100,10 +93,10 @@ export function UndoToast() {
 
 	return (
 		<Animated.View style={[dynamicStyles.container, { transform: [{ translateY }] }]}>
-			<Text style={[dynamicStyles.message, { fontFamily: fonts.bodySemiBold }]}>{TOAST_MESSAGE_DELETED}</Text>
+			<Text style={[dynamicStyles.message, { fontFamily: fonts.bodySemiBold }]}>{TOAST.MESSAGE_DELETED}</Text>
 
 			<Pressable onPress={handleUndo} style={styles.undoButton}>
-				<Text style={[dynamicStyles.undoText, { fontFamily: fonts.bodyBold }]}>{TOAST_UNDO_LABEL}</Text>
+				<Text style={[dynamicStyles.undoText, { fontFamily: fonts.bodyBold }]}>{TOAST.UNDO_LABEL}</Text>
 			</Pressable>
 		</Animated.View>
 	);
@@ -116,7 +109,8 @@ function createDynamicStyles(theme: ThemeColors) {
 			alignItems: 'center',
 			backgroundColor: theme.primary,
 			borderRadius: TOAST_BORDER_RADIUS,
-			bottom: TOAST_BOTTOM_OFFSET,
+			bottom: TOAST.BOTTOM_OFFSET,
+			boxShadow: `0 ${TOAST_SHADOW_OFFSET_HEIGHT}px ${TOAST_SHADOW_RADIUS}px ${theme.cardShadow}`,
 			elevation: TOAST_ELEVATION,
 			flexDirection: 'row',
 			justifyContent: 'space-between',
@@ -124,11 +118,7 @@ function createDynamicStyles(theme: ThemeColors) {
 			paddingHorizontal: TOAST_PADDING_HORIZONTAL,
 			paddingVertical: TOAST_PADDING_VERTICAL,
 			position: 'absolute',
-			right: TOAST_HORIZONTAL_MARGIN,
-			shadowColor: theme.cardShadow,
-			shadowOffset: { height: TOAST_SHADOW_OFFSET_HEIGHT, width: 0 },
-			shadowOpacity: 1,
-			shadowRadius: TOAST_SHADOW_RADIUS
+			right: TOAST_HORIZONTAL_MARGIN
 		},
 		message: {
 			color: theme.primaryText,

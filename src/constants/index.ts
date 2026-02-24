@@ -1,12 +1,28 @@
-export const CELEBRATION_DURATION = 400;
-export const CELEBRATION_SCALE = 1.05;
+export const CELEBRATION = {
+	DURATION: 400,
+	SCALE: 1.05
+} as const;
+
+export const CHAR_COUNT = {
+	DANGER_THRESHOLD: 0.95,
+	FONT_SIZE: 12,
+	WARNING_THRESHOLD: 0.8
+} as const;
+
 export const PRIORITY_FILTER_ALL = 'all';
-export const PROGRESS_ANIMATION_DURATION = 500;
-export const PROGRESS_BAR_HEIGHT = 6;
+
+export const PROGRESS = {
+	ANIMATION_DURATION: 500,
+	BAR_HEIGHT: 6
+} as const;
+
 export const TASK_TEXT_MAX_LENGTH = 1000;
-export const TOAST_ANIMATION_DURATION = 300;
-export const TOAST_AUTO_DISMISS_DURATION = 4000;
-export const TOAST_BOTTOM_OFFSET = 32;
-export const TOAST_MESSAGE_DELETED = 'Task deleted';
-export const TOAST_TRANSLATE_Y_HIDDEN = 100;
-export const TOAST_UNDO_LABEL = 'UNDO';
+
+export const TOAST = {
+	ANIMATION_DURATION: 300,
+	AUTO_DISMISS_DURATION: 4000,
+	BOTTOM_OFFSET: 32,
+	MESSAGE_DELETED: 'Task deleted',
+	TRANSLATE_Y_HIDDEN: 100,
+	UNDO_LABEL: 'UNDO'
+} as const;

@@ -3,7 +3,7 @@ import { Animated, Pressable, ScrollView, StyleSheet, Text, TextInput, View } fr
 import { useTaskStore } from '../store/useTaskStore';
 import { useUndoStore } from '../store/useUndoStore';
 import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
-import { TASK_TEXT_MAX_LENGTH } from '../constants';
+import { CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
 import { Priority, type Task } from '../types';
 import { formatDateTime } from '../utils/formatDateTime';
 
@@ -45,6 +45,9 @@ function TaskItemComponent({ task }: TaskItemProps) {
 	/* ===== Derived Values ===== */
 	const theme = darkMode ? darkTheme : lightTheme;
 	const dynamicStyles = createDynamicStyles(theme);
+	const editCharRatio = editText.length / TASK_TEXT_MAX_LENGTH;
+	const editCharCountColor = editCharRatio >= CHAR_COUNT.DANGER_THRESHOLD ? theme.danger : theme.textSecondary;
+	const showEditCharCount = isEditing && editCharRatio >= CHAR_COUNT.WARNING_THRESHOLD;
 
 	/* ===== Functions ===== */
 	function getPriorityColor(): string {
@@ -115,27 +118,33 @@ function TaskItemComponent({ task }: TaskItemProps) {
 
 			<View style={styles.content}>
 				{isEditing ? (
-					<View style={styles.editRow}>
-						<TextInput
-							autoFocus
-							maxLength={TASK_TEXT_MAX_LENGTH}
-							multiline
-							onChangeText={setEditText}
-							onSubmitEditing={handleSaveEdit}
-							style={[dynamicStyles.editInput, { fontFamily: fonts.body }]}
-							value={editText}
-						/>
+					<>
+						<View style={styles.editRow}>
+							<TextInput
+								autoFocus
+								maxLength={TASK_TEXT_MAX_LENGTH}
+								multiline
+								onChangeText={setEditText}
+								onSubmitEditing={handleSaveEdit}
+								style={[dynamicStyles.editInput, { fontFamily: fonts.body }]}
+								value={editText}
+							/>
 
-						<View style={styles.editActions}>
-							<Pressable onPress={handleSaveEdit} style={[styles.editAction, { backgroundColor: theme.success }]}>
-								<Text style={styles.editActionText}>✓</Text>
-							</Pressable>
+							<View style={styles.editActions}>
+								<Pressable onPress={handleSaveEdit} style={[styles.editAction, { backgroundColor: theme.success }]}>
+									<Text style={styles.editActionText}>✓</Text>
+								</Pressable>
 
-							<Pressable onPress={handleCancelEdit} style={[styles.editAction, { backgroundColor: theme.textSecondary }]}>
-								<Text style={styles.editActionText}>✕</Text>
-							</Pressable>
+								<Pressable onPress={handleCancelEdit} style={[styles.editAction, { backgroundColor: theme.textSecondary }]}>
+									<Text style={styles.editActionText}>✕</Text>
+								</Pressable>
+							</View>
 						</View>
-					</View>
+
+						<Text style={[styles.editCharCount, { color: editCharCountColor, fontFamily: fonts.body, opacity: showEditCharCount ? 1 : 0 }]}>
+							{editText.length}/{TASK_TEXT_MAX_LENGTH}
+						</Text>
+					</>
 				) : (
 					<Pressable onLongPress={handleEdit}>
 						<ScrollView nestedScrollEnabled showsVerticalScrollIndicator style={styles.taskTextScroll}>
@@ -175,15 +184,12 @@ function createDynamicStyles(theme: ThemeColors) {
 			alignItems: 'center',
 			backgroundColor: theme.surface,
 			borderRadius: 10,
+			boxShadow: `0 1px 4px ${theme.cardShadow}`,
 			elevation: 1,
 			flexDirection: 'row',
 			marginBottom: 8,
 			paddingHorizontal: 14,
-			paddingVertical: 16,
-			shadowColor: theme.cardShadow,
-			shadowOffset: { height: 1, width: 0 },
-			shadowOpacity: 1,
-			shadowRadius: 4
+			paddingVertical: 16
 		},
 		dateText: {
 			color: theme.textSecondary,
@@ -261,6 +267,11 @@ const styles = StyleSheet.create({
 	editActions: {
 		gap: 6,
 		justifyContent: 'center'
+	},
+	editCharCount: {
+		fontSize: CHAR_COUNT.FONT_SIZE,
+		marginTop: 4,
+		textAlign: 'right'
 	},
 	editRow: {
 		flexDirection: 'row',

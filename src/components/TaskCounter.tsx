@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
 import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
-import { CELEBRATION_DURATION, CELEBRATION_SCALE, PROGRESS_ANIMATION_DURATION, PROGRESS_BAR_HEIGHT } from '../constants';
+import { CELEBRATION, PROGRESS } from '../constants';
 
 /* ===== Component ===== */
 export function TaskCounter() {
@@ -27,7 +27,7 @@ export function TaskCounter() {
 	/* ===== Effects ===== */
 	useEffect(() => {
 		Animated.timing(progressAnim, {
-			duration: PROGRESS_ANIMATION_DURATION,
+			duration: PROGRESS.ANIMATION_DURATION,
 			toValue: progress,
 			useNativeDriver: false
 		}).start();
@@ -41,18 +41,18 @@ export function TaskCounter() {
 			Animated.parallel([
 				Animated.sequence([
 					Animated.timing(celebrationScaleAnim, {
-						duration: CELEBRATION_DURATION / 2,
-						toValue: CELEBRATION_SCALE,
+						duration: CELEBRATION.DURATION / 2,
+						toValue: CELEBRATION.SCALE,
 						useNativeDriver: true
 					}),
 					Animated.timing(celebrationScaleAnim, {
-						duration: CELEBRATION_DURATION / 2,
+						duration: CELEBRATION.DURATION / 2,
 						toValue: 1,
 						useNativeDriver: true
 					})
 				]),
 				Animated.timing(celebrationOpacityAnim, {
-					duration: CELEBRATION_DURATION,
+					duration: CELEBRATION.DURATION,
 					toValue: 1,
 					useNativeDriver: true
 				})
@@ -127,14 +127,14 @@ function createDynamicStyles(theme: ThemeColors) {
 		},
 		progressFill: {
 			backgroundColor: theme.progressFill,
-			borderRadius: PROGRESS_BAR_HEIGHT / 2,
-			height: PROGRESS_BAR_HEIGHT
+			borderRadius: PROGRESS.BAR_HEIGHT / 2,
+			height: PROGRESS.BAR_HEIGHT
 		},
 		progressTrack: {
 			backgroundColor: theme.progressBackground,
-			borderRadius: PROGRESS_BAR_HEIGHT / 2,
+			borderRadius: PROGRESS.BAR_HEIGHT / 2,
 			flex: 1,
-			height: PROGRESS_BAR_HEIGHT,
+			height: PROGRESS.BAR_HEIGHT,
 			overflow: 'hidden'
 		},
 		statusText: {
