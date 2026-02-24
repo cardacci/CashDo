@@ -21,6 +21,8 @@ export interface ThemeColors {
 	priorityHigh: string;
 	priorityLow: string;
 	priorityMedium: string;
+	progressBackground: string;
+	progressFill: string;
 	success: string;
 	surface: string;
 	text: string;
@@ -60,6 +62,8 @@ export const lightTheme: ThemeColors = {
 	priorityHigh: '#ED273E',
 	priorityLow: '#039BE5',
 	priorityMedium: '#BF4707',
+	progressBackground: '#E8E8E8',
+	progressFill: '#007A41',
 	success: '#007A41',
 	surface: '#FFFFFF',
 	text: '#303134',
@@ -88,6 +92,8 @@ export const darkTheme: ThemeColors = {
 	priorityHigh: '#FF4D5E',
 	priorityLow: '#4DB8E8',
 	priorityMedium: '#E8860A',
+	progressBackground: '#2A2A2A',
+	progressFill: '#00A854',
 	success: '#00A854',
 	surface: '#222222',
 	text: '#F0F0F0',
