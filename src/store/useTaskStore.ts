@@ -14,6 +14,7 @@ interface TaskState {
 	filterStatus: FilterStatus;
 	isHydrated: boolean;
 	priorityFilter: PriorityFilter;
+	restoreTask: (task: Task) => void;
 	setFilterStatus: (status: FilterStatus) => void;
 	setPriorityFilter: (priority: PriorityFilter) => void;
 	tasks: Task[];
@@ -55,6 +56,11 @@ export const useTaskStore = create<TaskState>()(
 			isHydrated: false,
 
 			priorityFilter: PRIORITY_FILTER_ALL,
+
+			restoreTask: (task: Task) =>
+				set((state) => ({
+					tasks: [...state.tasks, task]
+				})),
 
 			setFilterStatus: (filterStatus: FilterStatus) => set({ filterStatus }),
 

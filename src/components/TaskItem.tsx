@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
+import { useUndoStore } from '../store/useUndoStore';
 import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
 import { TASK_TEXT_MAX_LENGTH } from '../constants';
 import { Priority, type Task } from '../types';
+import { formatDateTime } from '../utils/formatDateTime';
 
 /* ===== Constants ===== */
 const ANIMATION_DURATION_EDIT = 150;
@@ -29,6 +31,7 @@ function TaskItemComponent({ task }: TaskItemProps) {
 	const deleteTask = useTaskStore((state) => state.deleteTask);
 	const editTask = useTaskStore((state) => state.editTask);
 	const toggleTask = useTaskStore((state) => state.toggleTask);
+	const setPendingDelete = useUndoStore((state) => state.setPendingDelete);
 
 	/* ===== State ===== */
 	const [editText, setEditText] = useState(task.text);
@@ -62,6 +65,7 @@ function TaskItemComponent({ task }: TaskItemProps) {
 
 	function handleDelete() {
 		Animated.timing(opacityAnim, { duration: ANIMATION_DURATION_EXIT, toValue: 0, useNativeDriver: true }).start(() => {
+			setPendingDelete(task);
 			deleteTask(task.id);
 		});
 	}
@@ -137,6 +141,8 @@ function TaskItemComponent({ task }: TaskItemProps) {
 						<ScrollView nestedScrollEnabled showsVerticalScrollIndicator style={styles.taskTextScroll}>
 							<Text style={[dynamicStyles.taskText, task.completed && styles.completedText, { fontFamily: fonts.body }]}>{task.text}</Text>
 						</ScrollView>
+
+						<Text style={[dynamicStyles.dateText, { fontFamily: fonts.body }]}>{formatDateTime(task.createdAt)}</Text>
 					</Pressable>
 				)}
 			</View>
@@ -172,11 +178,17 @@ function createDynamicStyles(theme: ThemeColors) {
 			elevation: 1,
 			flexDirection: 'row',
 			marginBottom: 8,
-			padding: 14,
+			paddingHorizontal: 14,
+			paddingVertical: 16,
 			shadowColor: theme.cardShadow,
 			shadowOffset: { height: 1, width: 0 },
 			shadowOpacity: 1,
 			shadowRadius: 4
+		},
+		dateText: {
+			color: theme.textSecondary,
+			fontSize: 11,
+			marginTop: 4
 		},
 		editInput: {
 			backgroundColor: theme.inputBackground,

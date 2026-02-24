@@ -9,6 +9,7 @@ import { PriorityFilter } from './src/components/PriorityFilter';
 import { TaskCounter } from './src/components/TaskCounter';
 import { TaskInput } from './src/components/TaskInput';
 import { TaskItem } from './src/components/TaskItem';
+import { UndoToast } from './src/components/UndoToast';
 import { useFilteredTasks } from './src/hooks/useFilteredTasks';
 import { useTaskStore } from './src/store/useTaskStore';
 import { darkTheme, fonts, lightTheme } from './src/theme';
@@ -98,6 +99,8 @@ export default function App() {
 						/>
 					</View>
 				</View>
+
+				<UndoToast />
 			</SafeAreaView>
 		</SafeAreaProvider>
 	);
@@ -135,7 +138,7 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	listContent: {
-		paddingBottom: 24
+		paddingBottom: 80
 	},
 	loadingContainer: {
 		alignItems: 'center',
