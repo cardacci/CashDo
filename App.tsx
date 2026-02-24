@@ -1,8 +1,8 @@
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { useFonts, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { FilterBar } from './src/components/FilterBar';
 import { PriorityFilter } from './src/components/PriorityFilter';
@@ -12,7 +12,7 @@ import { TaskItem } from './src/components/TaskItem';
 import { UndoToast } from './src/components/UndoToast';
 import { useFilteredTasks } from './src/hooks/useFilteredTasks';
 import { useTaskStore } from './src/store/useTaskStore';
-import { LAYOUT, PRIORITY_FILTER_ALL } from './src/constants';
+import { LAYOUT, PRIORITY_FILTER_ALL, TASK_LIST_REFRESH_DELAY } from './src/constants';
 import { darkTheme, fonts, lightTheme } from './src/theme';
 import { FilterStatus, StatusBarTheme, type Task } from './src/types';
 
@@ -39,12 +39,20 @@ export default function App() {
 		Poppins_700Bold
 	});
 
+	/* ===== State ===== */
+	const [refreshing, setRefreshing] = useState(false);
+
 	/* ===== Derived Values ===== */
 	const hasFiltersActive = filterStatus !== FilterStatus.All || priorityFilter !== PRIORITY_FILTER_ALL;
 	const isFilteredEmpty = tasks.length > 0 && filteredTasks.length === 0 && hasFiltersActive;
 	const theme = darkMode ? darkTheme : lightTheme;
 
 	/* ===== Functions ===== */
+	function onRefresh() {
+		setRefreshing(true);
+		setTimeout(() => setRefreshing(false), TASK_LIST_REFRESH_DELAY);
+	}
+
 	function resetFilters() {
 		setFilterStatus(FilterStatus.All);
 		setPriorityFilter(PRIORITY_FILTER_ALL);
@@ -119,6 +127,9 @@ export default function App() {
 								contentContainerStyle={styles.listContent}
 								data={filteredTasks}
 								keyExtractor={keyExtractor}
+								refreshControl={
+									<RefreshControl colors={[theme.accent]} onRefresh={onRefresh} refreshing={refreshing} tintColor={theme.accent} />
+								}
 								renderItem={renderItem}
 								showsVerticalScrollIndicator={false}
 								style={styles.list}

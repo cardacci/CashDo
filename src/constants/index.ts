@@ -24,6 +24,8 @@ export const PROGRESS = {
 	BAR_HEIGHT: 6
 } as const;
 
+export const TASK_LIST_REFRESH_DELAY = 500;
+
 export const TASK_TEXT_MAX_LENGTH = 1000;
 
 export const TOAST = {
