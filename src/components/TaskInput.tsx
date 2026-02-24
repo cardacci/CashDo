@@ -7,6 +7,8 @@ import { Priority } from '../types';
 
 /* ===== Constants ===== */
 
+const CLEAR_BUTTON_MIN_LENGTH = 10;
+
 const PRIORITIES: Priority[] = [Priority.High, Priority.Medium, Priority.Low];
 
 const PRIORITY_LABELS: Record<Priority, string> = {
@@ -31,6 +33,7 @@ export function TaskInput() {
 	const charRatio = text.length / TASK_TEXT_MAX_LENGTH;
 	const showCharCount = charRatio >= CHAR_COUNT.WARNING_THRESHOLD;
 	const charCountColor = charRatio >= CHAR_COUNT.DANGER_THRESHOLD ? theme.danger : theme.textSecondary;
+	const showClearButton = text.length >= CLEAR_BUTTON_MIN_LENGTH;
 
 	/* ===== Functions ===== */
 	function getPriorityColor(p: Priority): string {
@@ -42,6 +45,10 @@ export function TaskInput() {
 			case Priority.Low:
 				return theme.priorityLow;
 		}
+	}
+
+	function handleClearText() {
+		setText('');
 	}
 
 	function handleAddTask() {
@@ -59,16 +66,24 @@ export function TaskInput() {
 	/* ===== Render ===== */
 	return (
 		<View style={dynamicStyles.container}>
-			<TextInput
-				maxLength={TASK_TEXT_MAX_LENGTH}
-				onChangeText={setText}
-				onSubmitEditing={handleAddTask}
-				placeholder="What needs to be done?"
-				placeholderTextColor={theme.textSecondary}
-				returnKeyType="done"
-				style={[dynamicStyles.input, { fontFamily: fonts.body }]}
-				value={text}
-			/>
+			<View style={styles.inputWrapper}>
+				<TextInput
+					maxLength={TASK_TEXT_MAX_LENGTH}
+					onChangeText={setText}
+					onSubmitEditing={handleAddTask}
+					placeholder="What needs to be done?"
+					placeholderTextColor={theme.textSecondary}
+					returnKeyType="done"
+					style={[dynamicStyles.input, showClearButton && styles.inputWithClear, { fontFamily: fonts.body }]}
+					value={text}
+				/>
+
+				{showClearButton && (
+					<Pressable onPress={handleClearText} style={[styles.clearButton, { backgroundColor: theme.textSecondary }]}>
+						<Text style={[styles.clearButtonText, { color: theme.surface }]}>✕</Text>
+					</Pressable>
+				)}
+			</View>
 
 			<Text style={[styles.charCount, { color: charCountColor, fontFamily: fonts.body, opacity: showCharCount ? 1 : 0 }]}>
 				{text.length}/{TASK_TEXT_MAX_LENGTH}
@@ -140,6 +155,27 @@ const styles = StyleSheet.create({
 		marginBottom: 4,
 		marginTop: 2,
 		textAlign: 'right'
+	},
+	clearButton: {
+		alignItems: 'center',
+		borderRadius: 10,
+		height: 20,
+		justifyContent: 'center',
+		position: 'absolute',
+		right: 10,
+		top: '50%',
+		transform: [{ translateY: -10 }],
+		width: 20
+	},
+	clearButtonText: {
+		fontSize: 11,
+		fontWeight: '700'
+	},
+	inputWithClear: {
+		paddingRight: 36
+	},
+	inputWrapper: {
+		position: 'relative'
 	},
 	priorityButton: {
 		borderRadius: 8,
