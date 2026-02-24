@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTaskStore } from '../store/useTaskStore';
-import { type Task } from '../types';
+import { FilterStatus, PRIORITY_FILTER_ALL, type Task } from '../types';
 
 /* ===== Hook ===== */
 export function useFilteredTasks(): Task[] {
@@ -13,14 +13,14 @@ export function useFilteredTasks(): Task[] {
 		let result = [...tasks];
 
 		// Filter by status
-		if (filterStatus === 'completed') {
+		if (filterStatus === FilterStatus.Completed) {
 			result = result.filter((task) => task.completed);
-		} else if (filterStatus === 'pending') {
+		} else if (filterStatus === FilterStatus.Pending) {
 			result = result.filter((task) => !task.completed);
 		}
 
 		// Filter by priority
-		if (priorityFilter !== 'all') {
+		if (priorityFilter !== PRIORITY_FILTER_ALL) {
 			result = result.filter((task) => task.priority === priorityFilter);
 		}
 

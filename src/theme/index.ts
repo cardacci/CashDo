@@ -1,9 +1,12 @@
 /* ===== Types & Interfaces ===== */
 export interface ThemeColors {
+	accent: string;
+	accentText: string;
 	background: string;
 	badge: string;
 	badgeText: string;
 	border: string;
+	cardShadow: string;
 	checkboxBorder: string;
 	checkboxChecked: string;
 	danger: string;
@@ -24,53 +27,69 @@ export interface ThemeColors {
 	textSecondary: string;
 }
 
+/* ===== Fonts ===== */
+export const fonts = {
+	body: 'Inter_400Regular',
+	bodyBold: 'Inter_700Bold',
+	bodyMedium: 'Inter_500Medium',
+	bodySemiBold: 'Inter_600SemiBold',
+	heading: 'Poppins_700Bold',
+	headingSemiBold: 'Poppins_600SemiBold'
+};
+
 /* ===== Themes ===== */
 export const lightTheme: ThemeColors = {
-	background: '#f5f5f5',
-	badge: '#4a90d9',
-	badgeText: '#ffffff',
-	border: '#e0e0e0',
-	checkboxBorder: '#cccccc',
-	checkboxChecked: '#27ae60',
-	danger: '#e74c3c',
-	dangerText: '#ffffff',
-	filterActive: '#4a90d9',
-	filterActiveText: '#ffffff',
-	filterInactive: '#e8e8e8',
-	filterInactiveText: '#666666',
-	inputBackground: '#ffffff',
-	primary: '#4a90d9',
-	primaryText: '#ffffff',
-	priorityHigh: '#e74c3c',
-	priorityLow: '#3498db',
-	priorityMedium: '#f39c12',
-	success: '#27ae60',
-	surface: '#ffffff',
-	text: '#1a1a1a',
-	textSecondary: '#666666'
+	accent: '#FDFA3D',
+	accentText: '#303134',
+	background: '#FAFAFA',
+	badge: '#303134',
+	badgeText: '#FDFA3D',
+	border: '#E8E8E8',
+	cardShadow: 'rgba(0, 0, 0, 0.06)',
+	checkboxBorder: '#DBDBDB',
+	checkboxChecked: '#039BE5',
+	danger: '#ED273E',
+	dangerText: '#FFFFFF',
+	filterActive: '#303134',
+	filterActiveText: '#FDFA3D',
+	filterInactive: '#F0F0F0',
+	filterInactiveText: '#5E5E5E',
+	inputBackground: '#FFFFFF',
+	primary: '#303134',
+	primaryText: '#FDFA3D',
+	priorityHigh: '#ED273E',
+	priorityLow: '#039BE5',
+	priorityMedium: '#BF4707',
+	success: '#007A41',
+	surface: '#FFFFFF',
+	text: '#303134',
+	textSecondary: '#5E5E5E'
 };
 
 export const darkTheme: ThemeColors = {
-	background: '#121212',
-	badge: '#5a9fe6',
-	badgeText: '#ffffff',
-	border: '#333333',
+	accent: '#FDFA3D',
+	accentText: '#1A1A1A',
+	background: '#1A1A1A',
+	badge: '#FDFA3D',
+	badgeText: '#1A1A1A',
+	border: '#2E2E2E',
+	cardShadow: 'rgba(0, 0, 0, 0.3)',
 	checkboxBorder: '#555555',
-	checkboxChecked: '#2ecc71',
-	danger: '#e85d4a',
-	dangerText: '#ffffff',
-	filterActive: '#5a9fe6',
-	filterActiveText: '#ffffff',
-	filterInactive: '#2a2a2a',
-	filterInactiveText: '#999999',
-	inputBackground: '#2a2a2a',
-	primary: '#5a9fe6',
-	primaryText: '#ffffff',
-	priorityHigh: '#e85d4a',
-	priorityLow: '#5dade2',
-	priorityMedium: '#f5ab35',
-	success: '#2ecc71',
-	surface: '#1e1e1e',
-	text: '#e0e0e0',
+	checkboxChecked: '#039BE5',
+	danger: '#ED273E',
+	dangerText: '#FFFFFF',
+	filterActive: '#FDFA3D',
+	filterActiveText: '#1A1A1A',
+	filterInactive: '#2A2A2A',
+	filterInactiveText: '#888888',
+	inputBackground: '#252525',
+	primary: '#FDFA3D',
+	primaryText: '#1A1A1A',
+	priorityHigh: '#FF4D5E',
+	priorityLow: '#4DB8E8',
+	priorityMedium: '#E8860A',
+	success: '#00A854',
+	surface: '#222222',
+	text: '#F0F0F0',
 	textSecondary: '#999999'
 };

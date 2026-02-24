@@ -15,6 +15,7 @@
 		"name": "CashDo",
 		"newArchEnabled": true,
 		"orientation": "portrait",
+		"plugins": ["expo-font"],
 		"slug": "CashDo",
 		"splash": {
 			"backgroundColor": "#ffffff",

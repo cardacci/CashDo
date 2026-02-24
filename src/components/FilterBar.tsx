@@ -1,13 +1,13 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
-import { darkTheme, lightTheme } from '../theme';
-import { type FilterStatus } from '../types';
+import { darkTheme, fonts, lightTheme } from '../theme';
+import { FilterStatus } from '../types';
 
-/* ===== Constants & Enums ===== */
+/* ===== Constants ===== */
 const FILTERS: { key: FilterStatus; label: string }[] = [
-	{ key: 'all', label: 'All' },
-	{ key: 'completed', label: 'Completed' },
-	{ key: 'pending', label: 'Pending' }
+	{ key: FilterStatus.All, label: 'All' },
+	{ key: FilterStatus.Completed, label: 'Completed' },
+	{ key: FilterStatus.Pending, label: 'Pending' }
 ];
 
 /* ===== Component ===== */
@@ -29,16 +29,14 @@ export function FilterBar() {
 				return (
 					<Pressable
 						key={filter.key}
-						style={[
-							styles.filterButton,
-							{
-								backgroundColor: isActive ? theme.filterActive : theme.filterInactive,
-								borderColor: theme.filterActive
-							}
-						]}
 						onPress={() => setFilterStatus(filter.key)}
+						style={[styles.filterButton, { backgroundColor: isActive ? theme.filterActive : theme.filterInactive }]}
 					>
-						<Text style={[styles.filterText, { color: isActive ? theme.filterActiveText : theme.filterInactiveText }]}>{filter.label}</Text>
+						<Text
+							style={[styles.filterText, { color: isActive ? theme.filterActiveText : theme.filterInactiveText, fontFamily: fonts.bodyMedium }]}
+						>
+							{filter.label}
+						</Text>
 					</Pressable>
 				);
 			})}
@@ -54,14 +52,12 @@ const styles = StyleSheet.create({
 		marginBottom: 8
 	},
 	filterButton: {
-		borderRadius: 20,
-		borderWidth: 1,
+		borderRadius: 8,
 		flex: 1,
-		paddingVertical: 8
+		paddingVertical: 10
 	},
 	filterText: {
 		fontSize: 13,
-		fontWeight: '600',
 		textAlign: 'center'
 	}
 });

@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-
 import { useTaskStore } from '../store/useTaskStore';
-import { darkTheme, lightTheme, type ThemeColors } from '../theme';
-import { type Priority, type Task } from '../types';
+import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
+import { Priority, type Task } from '../types';
 
 /* ===== Constants ===== */
 const PRIORITY_LABELS: Record<Priority, string> = {
-	high: 'HIGH',
-	medium: 'MED',
-	low: 'LOW'
+	[Priority.High]: 'HIGH',
+	[Priority.Low]: 'LOW',
+	[Priority.Medium]: 'MED'
 };
 
 /* ===== Types ===== */
@@ -36,13 +35,18 @@ function TaskItemComponent({ task }: TaskItemProps) {
 	/* ===== Functions ===== */
 	function getPriorityColor(): string {
 		switch (task.priority) {
-			case 'high':
+			case Priority.High:
 				return theme.priorityHigh;
-			case 'medium':
+			case Priority.Medium:
 				return theme.priorityMedium;
-			case 'low':
+			case Priority.Low:
 				return theme.priorityLow;
 		}
+	}
+
+	function handleCancelEdit() {
+		setEditText(task.text);
+		setIsEditing(false);
 	}
 
 	function handleEdit() {
@@ -60,23 +64,18 @@ function TaskItemComponent({ task }: TaskItemProps) {
 		setIsEditing(false);
 	}
 
-	function handleCancelEdit() {
-		setEditText(task.text);
-		setIsEditing(false);
-	}
-
 	/* ===== Render ===== */
 	return (
 		<View style={dynamicStyles.container}>
 			<Pressable
+				onPress={() => toggleTask(task.id)}
 				style={[
 					styles.checkbox,
 					{
-						borderColor: task.completed ? theme.checkboxChecked : theme.checkboxBorder,
-						backgroundColor: task.completed ? theme.checkboxChecked : 'transparent'
+						backgroundColor: task.completed ? theme.checkboxChecked : 'transparent',
+						borderColor: task.completed ? theme.checkboxChecked : theme.checkboxBorder
 					}
 				]}
-				onPress={() => toggleTask(task.id)}
 			>
 				{task.completed && <Text style={styles.checkmark}>✓</Text>}
 			</Pressable>
@@ -84,17 +83,25 @@ function TaskItemComponent({ task }: TaskItemProps) {
 			<View style={styles.content}>
 				{isEditing ? (
 					<View style={styles.editRow}>
-						<TextInput style={dynamicStyles.editInput} value={editText} onChangeText={setEditText} onSubmitEditing={handleSaveEdit} autoFocus />
-						<Pressable style={styles.saveButton} onPress={handleSaveEdit}>
-							<Text style={styles.saveButtonText}>✓</Text>
+						<TextInput
+							autoFocus
+							onChangeText={setEditText}
+							onSubmitEditing={handleSaveEdit}
+							style={[dynamicStyles.editInput, { fontFamily: fonts.body }]}
+							value={editText}
+						/>
+
+						<Pressable onPress={handleSaveEdit} style={[styles.editAction, { backgroundColor: theme.success }]}>
+							<Text style={styles.editActionText}>✓</Text>
 						</Pressable>
-						<Pressable style={styles.cancelButton} onPress={handleCancelEdit}>
-							<Text style={styles.cancelButtonText}>✕</Text>
+
+						<Pressable onPress={handleCancelEdit} style={[styles.editAction, { backgroundColor: theme.textSecondary }]}>
+							<Text style={styles.editActionText}>✕</Text>
 						</Pressable>
 					</View>
 				) : (
 					<Pressable onLongPress={handleEdit}>
-						<Text style={[dynamicStyles.taskText, task.completed && styles.completedText]} numberOfLines={2}>
+						<Text numberOfLines={2} style={[dynamicStyles.taskText, task.completed && styles.completedText, { fontFamily: fonts.body }]}>
 							{task.text}
 						</Text>
 					</Pressable>
@@ -102,17 +109,16 @@ function TaskItemComponent({ task }: TaskItemProps) {
 			</View>
 
 			<View style={[styles.priorityBadge, { backgroundColor: getPriorityColor() }]}>
-				<Text style={styles.priorityText}>{PRIORITY_LABELS[task.priority]}</Text>
+				<Text style={[styles.priorityText, { fontFamily: fonts.bodySemiBold }]}>{PRIORITY_LABELS[task.priority]}</Text>
 			</View>
 
-			<Pressable style={[styles.deleteButton, { backgroundColor: theme.danger }]} onPress={() => deleteTask(task.id)}>
+			<Pressable onPress={() => deleteTask(task.id)} style={[styles.deleteButton, { backgroundColor: theme.danger }]}>
 				<Text style={styles.deleteButtonText}>✕</Text>
 			</Pressable>
 		</View>
 	);
 }
 
-/* ===== Memo ===== */
 export const TaskItem = React.memo(TaskItemComponent);
 
 /* ===== Styles ===== */
@@ -121,27 +127,31 @@ function createDynamicStyles(theme: ThemeColors) {
 		container: {
 			alignItems: 'center',
 			backgroundColor: theme.surface,
-			borderColor: theme.border,
 			borderRadius: 10,
-			borderWidth: 1,
+			elevation: 1,
 			flexDirection: 'row',
 			marginBottom: 8,
-			padding: 12
+			padding: 14,
+			shadowColor: theme.cardShadow,
+			shadowOffset: { height: 1, width: 0 },
+			shadowOpacity: 1,
+			shadowRadius: 4
 		},
 		editInput: {
 			backgroundColor: theme.inputBackground,
 			borderColor: theme.border,
-			borderRadius: 6,
+			borderRadius: 8,
 			borderWidth: 1,
 			color: theme.text,
 			flex: 1,
-			fontSize: 15,
-			paddingHorizontal: 8,
-			paddingVertical: 4
+			fontSize: 14,
+			paddingHorizontal: 10,
+			paddingVertical: 6
 		},
 		taskText: {
 			color: theme.text,
-			fontSize: 15
+			fontSize: 14,
+			lineHeight: 20
 		}
 	});
 }
@@ -149,78 +159,64 @@ function createDynamicStyles(theme: ThemeColors) {
 const styles = StyleSheet.create({
 	checkbox: {
 		alignItems: 'center',
-		borderRadius: 4,
+		borderRadius: 6,
 		borderWidth: 2,
-		height: 24,
+		height: 22,
 		justifyContent: 'center',
-		marginRight: 10,
-		width: 24
+		marginRight: 12,
+		width: 22
 	},
 	checkmark: {
-		color: '#ffffff',
-		fontSize: 14,
+		color: '#FFFFFF',
+		fontSize: 13,
 		fontWeight: 'bold'
+	},
+	completedText: {
+		opacity: 0.45,
+		textDecorationLine: 'line-through'
 	},
 	content: {
 		flex: 1,
-		marginRight: 8
+		marginRight: 10
+	},
+	deleteButton: {
+		alignItems: 'center',
+		borderRadius: 6,
+		height: 28,
+		justifyContent: 'center',
+		width: 28
+	},
+	deleteButtonText: {
+		color: '#FFFFFF',
+		fontSize: 13,
+		fontWeight: 'bold'
+	},
+	editAction: {
+		alignItems: 'center',
+		borderRadius: 6,
+		height: 28,
+		justifyContent: 'center',
+		width: 28
+	},
+	editActionText: {
+		color: '#FFFFFF',
+		fontSize: 13,
+		fontWeight: 'bold'
 	},
 	editRow: {
 		alignItems: 'center',
 		flexDirection: 'row',
 		gap: 6
 	},
-	saveButton: {
-		alignItems: 'center',
-		backgroundColor: '#27ae60',
-		borderRadius: 4,
-		height: 28,
-		justifyContent: 'center',
-		width: 28
-	},
-	saveButtonText: {
-		color: '#ffffff',
-		fontSize: 14,
-		fontWeight: 'bold'
-	},
-	cancelButton: {
-		alignItems: 'center',
-		backgroundColor: '#999999',
-		borderRadius: 4,
-		height: 28,
-		justifyContent: 'center',
-		width: 28
-	},
-	cancelButtonText: {
-		color: '#ffffff',
-		fontSize: 14,
-		fontWeight: 'bold'
-	},
-	completedText: {
-		opacity: 0.5,
-		textDecorationLine: 'line-through'
-	},
 	priorityBadge: {
-		borderRadius: 4,
-		marginRight: 8,
-		paddingHorizontal: 6,
-		paddingVertical: 3
+		borderRadius: 6,
+		marginRight: 10,
+		paddingHorizontal: 8,
+		paddingVertical: 4
 	},
 	priorityText: {
-		color: '#ffffff',
-		fontSize: 10,
-		fontWeight: 'bold'
-	},
-	deleteButton: {
-		alignItems: 'center',
-		borderRadius: 4,
-		height: 28,
-		justifyContent: 'center',
-		width: 28
-	},
-	deleteButtonText: {
-		color: '#ffffff',
-		fontSize: 14,
-		fontWeight: 'bold'
+		color: '#FFFFFF',
+		fontSize: 9,
+		letterSpacing: 0.5
 	}
 });

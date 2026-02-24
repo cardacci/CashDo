@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { generateId } from '../utils/generateId';
-import { type FilterStatus, type Priority, type PriorityFilter, type Task } from '../types';
+import { FilterStatus, PRIORITY_FILTER_ALL, Priority, type PriorityFilter, type Task } from '../types';
 
 /* ===== Types & Interfaces ===== */
 interface TaskState {
@@ -23,27 +23,21 @@ interface TaskState {
 export const useTaskStore = create<TaskState>()(
 	persist(
 		(set) => ({
-			/* ===== State ===== */
-			darkMode: false,
-			filterStatus: 'all',
-			isHydrated: false,
-			priorityFilter: 'all',
-			tasks: [],
-
-			/* ===== Actions ===== */
 			addTask: (text: string, priority: Priority) =>
 				set((state) => ({
 					tasks: [
 						{
-							id: generateId(),
-							text,
 							completed: false,
+							createdAt: Date.now(),
+							id: generateId(),
 							priority,
-							createdAt: Date.now()
+							text
 						},
 						...state.tasks
 					]
 				})),
+
+			darkMode: false,
 
 			deleteTask: (id: string) =>
 				set((state) => ({
@@ -55,9 +49,17 @@ export const useTaskStore = create<TaskState>()(
 					tasks: state.tasks.map((task) => (task.id === id ? { ...task, text } : task))
 				})),
 
+			filterStatus: FilterStatus.All,
+
+			isHydrated: false,
+
+			priorityFilter: PRIORITY_FILTER_ALL,
+
 			setFilterStatus: (filterStatus: FilterStatus) => set({ filterStatus }),
 
 			setPriorityFilter: (priorityFilter: PriorityFilter) => set({ priorityFilter }),
+
+			tasks: [] satisfies Task[],
 
 			toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
 
@@ -80,8 +82,8 @@ export const useTaskStore = create<TaskState>()(
 				};
 			},
 			partialize: (state) => ({
-				tasks: state.tasks,
-				darkMode: state.darkMode
+				darkMode: state.darkMode,
+				tasks: state.tasks
 			}),
 			storage: createJSONStorage(() => AsyncStorage)
 		}

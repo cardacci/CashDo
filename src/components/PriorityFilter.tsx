@@ -1,14 +1,14 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
-import { darkTheme, lightTheme } from '../theme';
-import { type PriorityFilter as PriorityFilterType } from '../types';
+import { darkTheme, fonts, lightTheme } from '../theme';
+import { PRIORITY_FILTER_ALL, Priority, type PriorityFilter as PriorityFilterType } from '../types';
 
-/* ===== Constants & Enums ===== */
-const PRIORITY_OPTIONS: { key: PriorityFilterType; label: string; color: string }[] = [
-	{ key: 'all', label: 'All', color: '#888888' },
-	{ key: 'high', label: 'High', color: '#e74c3c' },
-	{ key: 'medium', label: 'Medium', color: '#f39c12' },
-	{ key: 'low', label: 'Low', color: '#3498db' }
+/* ===== Constants ===== */
+const PRIORITY_OPTIONS: { color: string; key: PriorityFilterType; label: string }[] = [
+	{ color: '#5E5E5E', key: PRIORITY_FILTER_ALL, label: 'All' },
+	{ color: '#ED273E', key: Priority.High, label: 'High' },
+	{ color: '#BF4707', key: Priority.Medium, label: 'Medium' },
+	{ color: '#039BE5', key: Priority.Low, label: 'Low' }
 ];
 
 /* ===== Component ===== */
@@ -25,21 +25,18 @@ export function PriorityFilter() {
 	return (
 		<View style={styles.container}>
 			{PRIORITY_OPTIONS.map((option) => {
-				const isActive = priorityFilter === option.key;
+				const { color, key, label } = option;
+				const isActive = priorityFilter === key;
 
 				return (
 					<Pressable
-						key={option.key}
-						style={[
-							styles.filterButton,
-							{
-								backgroundColor: isActive ? option.color : theme.filterInactive,
-								borderColor: option.color
-							}
-						]}
-						onPress={() => setPriorityFilter(option.key)}
+						key={key}
+						onPress={() => setPriorityFilter(key)}
+						style={[styles.filterButton, { backgroundColor: isActive ? color : theme.filterInactive }]}
 					>
-						<Text style={[styles.filterText, { color: isActive ? '#ffffff' : theme.filterInactiveText }]}>{option.label}</Text>
+						<Text style={[styles.filterText, { color: isActive ? '#FFFFFF' : theme.filterInactiveText, fontFamily: fonts.bodyMedium }]}>
+							{label}
+						</Text>
 					</Pressable>
 				);
 			})}
@@ -55,14 +52,12 @@ const styles = StyleSheet.create({
 		marginBottom: 16
 	},
 	filterButton: {
-		borderRadius: 20,
-		borderWidth: 1,
+		borderRadius: 8,
 		flex: 1,
-		paddingVertical: 8
+		paddingVertical: 10
 	},
 	filterText: {
 		fontSize: 13,
-		fontWeight: '600',
 		textAlign: 'center'
 	}
 });
