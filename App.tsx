@@ -77,68 +77,70 @@ export default function App() {
 	/* ===== Render ===== */
 	return (
 		<SafeAreaProvider>
-			<SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
-				<StatusBar style={darkMode ? StatusBarTheme.Light : StatusBarTheme.Dark} />
+			<SafeAreaView edges={['top']} style={[styles.safeArea, { backgroundColor: theme.accent }]}>
+				<StatusBar style={StatusBarTheme.Dark} />
 
-				<View style={styles.appWrapper}>
-					<View style={styles.container}>
-						{/* Header */}
-						<View style={[styles.header, { backgroundColor: theme.accent }]}>
-							<Text style={[styles.title, { color: theme.accentText, fontFamily: fonts.heading }]}>CashDo</Text>
+				<SafeAreaView edges={['bottom', 'left', 'right']} style={[styles.safeArea, { backgroundColor: theme.background }]}>
+					<View style={styles.appWrapper}>
+						<View style={styles.container}>
+							{/* Header */}
+							<View style={[styles.header, { backgroundColor: theme.accent }]}>
+								<Text style={[styles.title, { color: theme.accentText, fontFamily: fonts.heading }]}>CashDo</Text>
 
-							<Pressable onPress={toggleDarkMode} style={[styles.themeToggle, { backgroundColor: theme.accentText }]}>
-								<Text style={styles.themeToggleText}>{darkMode ? '☀️' : '🌙'}</Text>
-							</Pressable>
+								<Pressable onPress={toggleDarkMode} style={[styles.themeToggle, { backgroundColor: theme.accentText }]}>
+									<Text style={styles.themeToggleText}>{darkMode ? '☀️' : '🌙'}</Text>
+								</Pressable>
+							</View>
+
+							<View style={[styles.content, { backgroundColor: theme.background }]}>
+								{/* Task Counter */}
+								<TaskCounter />
+
+								{/* Task Input */}
+								<TaskInput />
+
+								{/* Filters */}
+								<FilterBar />
+
+								<PriorityFilter />
+
+								{/* Task List */}
+								<FlatList
+									ListEmptyComponent={
+										<View style={styles.emptyContainer}>
+											<Text style={[styles.emptyText, { color: theme.textSecondary, fontFamily: fonts.headingSemiBold }]}>
+												{isFilteredEmpty ? 'No tasks match the selected filters' : 'No tasks found'}
+											</Text>
+
+											<Text style={[styles.emptySubtext, { color: theme.textSecondary, fontFamily: fonts.body }]}>
+												{isFilteredEmpty ? 'Try changing your filters or reset them' : 'Add a task above to get started'}
+											</Text>
+
+											{isFilteredEmpty && (
+												<Pressable onPress={resetFilters} style={[styles.resetButton, { backgroundColor: theme.accent }]}>
+													<Text style={[styles.resetButtonText, { color: theme.accentText, fontFamily: fonts.bodyMedium }]}>
+														Reset Filters
+													</Text>
+												</Pressable>
+											)}
+										</View>
+									}
+									contentContainerStyle={styles.listContent}
+									data={filteredTasks}
+									keyExtractor={keyExtractor}
+									refreshControl={
+										<RefreshControl colors={[theme.accent]} onRefresh={onRefresh} refreshing={refreshing} tintColor={theme.accent} />
+									}
+									renderItem={renderItem}
+									showsVerticalScrollIndicator={false}
+									style={styles.list}
+								/>
+							</View>
 						</View>
 
-						<View style={styles.content}>
-							{/* Task Counter */}
-							<TaskCounter />
-
-							{/* Task Input */}
-							<TaskInput />
-
-							{/* Filters */}
-							<FilterBar />
-
-							<PriorityFilter />
-
-							{/* Task List */}
-							<FlatList
-								ListEmptyComponent={
-									<View style={styles.emptyContainer}>
-										<Text style={[styles.emptyText, { color: theme.textSecondary, fontFamily: fonts.headingSemiBold }]}>
-											{isFilteredEmpty ? 'No tasks match the selected filters' : 'No tasks found'}
-										</Text>
-
-										<Text style={[styles.emptySubtext, { color: theme.textSecondary, fontFamily: fonts.body }]}>
-											{isFilteredEmpty ? 'Try changing your filters or reset them' : 'Add a task above to get started'}
-										</Text>
-
-										{isFilteredEmpty && (
-											<Pressable onPress={resetFilters} style={[styles.resetButton, { backgroundColor: theme.accent }]}>
-												<Text style={[styles.resetButtonText, { color: theme.accentText, fontFamily: fonts.bodyMedium }]}>
-													Reset Filters
-												</Text>
-											</Pressable>
-										)}
-									</View>
-								}
-								contentContainerStyle={styles.listContent}
-								data={filteredTasks}
-								keyExtractor={keyExtractor}
-								refreshControl={
-									<RefreshControl colors={[theme.accent]} onRefresh={onRefresh} refreshing={refreshing} tintColor={theme.accent} />
-								}
-								renderItem={renderItem}
-								showsVerticalScrollIndicator={false}
-								style={styles.list}
-							/>
-						</View>
+						<UndoToast />
 					</View>
-
-					<UndoToast />
-				</View>
+				</SafeAreaView>
 			</SafeAreaView>
 		</SafeAreaProvider>
 	);
