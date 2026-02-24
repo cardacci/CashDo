@@ -20,6 +20,7 @@ A TODO list app built with React Native, Expo, and TypeScript. Inspired by the l
 
 - All linter and Prettier rules passing
 - AI agent and developer coding guidelines configured via skills and project rules
+- GitHub Actions CI/CD pipeline: lint, build, and auto-deploy to [GitHub Pages](https://cardacci.github.io/CashDo/)
 
 ## Roadmap
 

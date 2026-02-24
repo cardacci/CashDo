@@ -25,6 +25,7 @@
 		"prettier": "^3.8.1",
 		"typescript": "~5.9.2"
 	},
+	"homepage": "https://cardacci.github.io/CashDo",
 	"main": "index.ts",
 	"name": "cashdo",
 	"private": true,
