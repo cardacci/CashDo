@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
 import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
+import { TASK_TEXT_MAX_LENGTH } from '../constants';
 import { Priority } from '../types';
 
 /* ===== Constants ===== */
@@ -55,6 +56,7 @@ export function TaskInput() {
 	return (
 		<View style={dynamicStyles.container}>
 			<TextInput
+				maxLength={TASK_TEXT_MAX_LENGTH}
 				onChangeText={setText}
 				onSubmitEditing={handleAddTask}
 				placeholder="What needs to be done?"

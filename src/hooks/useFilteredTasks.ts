@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useTaskStore } from '../store/useTaskStore';
-import { FilterStatus, PRIORITY_FILTER_ALL, type Task } from '../types';
+import { PRIORITY_FILTER_ALL } from '../constants';
+import { FilterStatus, type Task } from '../types';
 
 /* ===== Hook ===== */
 export function useFilteredTasks(): Task[] {

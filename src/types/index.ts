@@ -1,3 +1,5 @@
+import { PRIORITY_FILTER_ALL } from '../constants';
+
 /* ===== Enums ===== */
 export enum FilterStatus {
 	All = 'all',
@@ -15,9 +17,6 @@ export enum StatusBarTheme {
 	Dark = 'dark',
 	Light = 'light'
 }
-
-/* ===== Constants ===== */
-export const PRIORITY_FILTER_ALL = 'all' as const;
 
 /* ===== Types & Interfaces ===== */
 export type PriorityFilter = Priority | typeof PRIORITY_FILTER_ALL;

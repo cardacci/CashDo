@@ -2,7 +2,7 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } f
 import { useFonts, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, FlatList, LayoutAnimation, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { FilterBar } from './src/components/FilterBar';
 import { PriorityFilter } from './src/components/PriorityFilter';
@@ -35,17 +35,8 @@ export default function App() {
 	/* ===== Derived Values ===== */
 	const theme = darkMode ? darkTheme : lightTheme;
 
-	/* ===== Functions ===== */
-	function handleRefresh() {
-		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-	}
-
 	/* ===== Callbacks ===== */
-	const renderItem = useCallback(({ item }: { item: Task }) => {
-		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-
-		return <TaskItem task={item} />;
-	}, []);
+	const renderItem = useCallback(({ item }: { item: Task }) => <TaskItem task={item} />, []);
 
 	const keyExtractor = useCallback((item: Task) => item.id, []);
 
@@ -101,7 +92,6 @@ export default function App() {
 							contentContainerStyle={styles.listContent}
 							data={filteredTasks}
 							keyExtractor={keyExtractor}
-							refreshControl={<RefreshControl onRefresh={handleRefresh} refreshing={false} tintColor={theme.accent} />}
 							renderItem={renderItem}
 							showsVerticalScrollIndicator={false}
 							style={styles.list}

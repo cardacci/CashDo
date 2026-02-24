@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
 import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
+import { TASK_TEXT_MAX_LENGTH } from '../constants';
 import { Priority, type Task } from '../types';
 
 /* ===== Constants ===== */
+const ANIMATION_DURATION_EDIT = 150;
+const ANIMATION_DURATION_ENTRY = 300;
+const ANIMATION_DURATION_EXIT = 200;
+const RECENTLY_CREATED_THRESHOLD = 1000;
+
 const PRIORITY_LABELS: Record<Priority, string> = {
 	[Priority.High]: 'HIGH',
 	[Priority.Low]: 'LOW',
@@ -28,6 +34,11 @@ function TaskItemComponent({ task }: TaskItemProps) {
 	const [editText, setEditText] = useState(task.text);
 	const [isEditing, setIsEditing] = useState(false);
 
+	/* ===== Refs ===== */
+	const isNew = useRef(Date.now() - task.createdAt < RECENTLY_CREATED_THRESHOLD).current;
+	const opacityAnim = useRef(new Animated.Value(isNew ? 0 : 1)).current;
+	const scaleAnim = useRef(new Animated.Value(1)).current;
+
 	/* ===== Derived Values ===== */
 	const theme = darkMode ? darkTheme : lightTheme;
 	const dynamicStyles = createDynamicStyles(theme);
@@ -49,6 +60,12 @@ function TaskItemComponent({ task }: TaskItemProps) {
 		setIsEditing(false);
 	}
 
+	function handleDelete() {
+		Animated.timing(opacityAnim, { duration: ANIMATION_DURATION_EXIT, toValue: 0, useNativeDriver: true }).start(() => {
+			deleteTask(task.id);
+		});
+	}
+
 	function handleEdit() {
 		setEditText(task.text);
 		setIsEditing(true);
@@ -59,14 +76,26 @@ function TaskItemComponent({ task }: TaskItemProps) {
 
 		if (trimmed && trimmed !== task.text) {
 			editTask(task.id, trimmed);
+
+			Animated.sequence([
+				Animated.timing(scaleAnim, { duration: ANIMATION_DURATION_EDIT, toValue: 1.03, useNativeDriver: true }),
+				Animated.timing(scaleAnim, { duration: ANIMATION_DURATION_EDIT, toValue: 1, useNativeDriver: true })
+			]).start();
 		}
 
 		setIsEditing(false);
 	}
 
+	/* ===== Effects ===== */
+	useEffect(() => {
+		if (isNew) {
+			Animated.timing(opacityAnim, { duration: ANIMATION_DURATION_ENTRY, toValue: 1, useNativeDriver: true }).start();
+		}
+	}, [isNew, opacityAnim]);
+
 	/* ===== Render ===== */
 	return (
-		<View style={dynamicStyles.container}>
+		<Animated.View style={[dynamicStyles.container, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
 			<Pressable
 				onPress={() => toggleTask(task.id)}
 				style={[
@@ -85,37 +114,49 @@ function TaskItemComponent({ task }: TaskItemProps) {
 					<View style={styles.editRow}>
 						<TextInput
 							autoFocus
+							maxLength={TASK_TEXT_MAX_LENGTH}
+							multiline
 							onChangeText={setEditText}
 							onSubmitEditing={handleSaveEdit}
 							style={[dynamicStyles.editInput, { fontFamily: fonts.body }]}
 							value={editText}
 						/>
 
-						<Pressable onPress={handleSaveEdit} style={[styles.editAction, { backgroundColor: theme.success }]}>
-							<Text style={styles.editActionText}>✓</Text>
-						</Pressable>
+						<View style={styles.editActions}>
+							<Pressable onPress={handleSaveEdit} style={[styles.editAction, { backgroundColor: theme.success }]}>
+								<Text style={styles.editActionText}>✓</Text>
+							</Pressable>
 
-						<Pressable onPress={handleCancelEdit} style={[styles.editAction, { backgroundColor: theme.textSecondary }]}>
-							<Text style={styles.editActionText}>✕</Text>
-						</Pressable>
+							<Pressable onPress={handleCancelEdit} style={[styles.editAction, { backgroundColor: theme.textSecondary }]}>
+								<Text style={styles.editActionText}>✕</Text>
+							</Pressable>
+						</View>
 					</View>
 				) : (
 					<Pressable onLongPress={handleEdit}>
-						<Text numberOfLines={2} style={[dynamicStyles.taskText, task.completed && styles.completedText, { fontFamily: fonts.body }]}>
-							{task.text}
-						</Text>
+						<ScrollView nestedScrollEnabled showsVerticalScrollIndicator style={styles.taskTextScroll}>
+							<Text style={[dynamicStyles.taskText, task.completed && styles.completedText, { fontFamily: fonts.body }]}>{task.text}</Text>
+						</ScrollView>
 					</Pressable>
 				)}
 			</View>
 
-			<View style={[styles.priorityBadge, { backgroundColor: getPriorityColor() }]}>
-				<Text style={[styles.priorityText, { fontFamily: fonts.bodySemiBold }]}>{PRIORITY_LABELS[task.priority]}</Text>
-			</View>
+			{!isEditing && (
+				<>
+					<View style={[styles.priorityBadge, { backgroundColor: getPriorityColor() }]}>
+						<Text style={[styles.priorityText, { fontFamily: fonts.bodySemiBold }]}>{PRIORITY_LABELS[task.priority]}</Text>
+					</View>
 
-			<Pressable onPress={() => deleteTask(task.id)} style={[styles.deleteButton, { backgroundColor: theme.danger }]}>
-				<Text style={styles.deleteButtonText}>✕</Text>
-			</Pressable>
-		</View>
+					<Pressable onPress={handleEdit} style={styles.actionButton}>
+						<Text style={[styles.actionButtonText, { color: theme.textSecondary }]}>✎</Text>
+					</Pressable>
+
+					<Pressable onPress={handleDelete} style={styles.actionButton}>
+						<Text style={[styles.actionButtonText, { color: theme.danger }]}>✕</Text>
+					</Pressable>
+				</>
+			)}
+		</Animated.View>
 	);
 }
 
@@ -156,7 +197,21 @@ function createDynamicStyles(theme: ThemeColors) {
 	});
 }
 
+const TASK_TEXT_LINE_HEIGHT = 20;
+const TASK_TEXT_MAX_LINES = 3;
+const TASK_TEXT_MAX_HEIGHT = TASK_TEXT_LINE_HEIGHT * TASK_TEXT_MAX_LINES;
+
 const styles = StyleSheet.create({
+	actionButton: {
+		alignItems: 'center',
+		height: 24,
+		justifyContent: 'center',
+		marginLeft: 4,
+		width: 24
+	},
+	actionButtonText: {
+		fontSize: 14
+	},
 	checkbox: {
 		alignItems: 'center',
 		borderRadius: 6,
@@ -179,18 +234,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		marginRight: 10
 	},
-	deleteButton: {
-		alignItems: 'center',
-		borderRadius: 6,
-		height: 28,
-		justifyContent: 'center',
-		width: 28
-	},
-	deleteButtonText: {
-		color: '#FFFFFF',
-		fontSize: 13,
-		fontWeight: 'bold'
-	},
 	editAction: {
 		alignItems: 'center',
 		borderRadius: 6,
@@ -203,14 +246,17 @@ const styles = StyleSheet.create({
 		fontSize: 13,
 		fontWeight: 'bold'
 	},
+	editActions: {
+		gap: 6,
+		justifyContent: 'center'
+	},
 	editRow: {
-		alignItems: 'center',
 		flexDirection: 'row',
-		gap: 6
+		gap: 8
 	},
 	priorityBadge: {
 		borderRadius: 6,
-		marginRight: 10,
+		marginLeft: 8,
 		paddingHorizontal: 8,
 		paddingVertical: 4
 	},
@@ -218,5 +264,8 @@ const styles = StyleSheet.create({
 		color: '#FFFFFF',
 		fontSize: 9,
 		letterSpacing: 0.5
+	},
+	taskTextScroll: {
+		maxHeight: TASK_TEXT_MAX_HEIGHT
 	}
 });

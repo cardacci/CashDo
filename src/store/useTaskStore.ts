@@ -2,7 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { generateId } from '../utils/generateId';
-import { FilterStatus, PRIORITY_FILTER_ALL, Priority, type PriorityFilter, type Task } from '../types';
+import { PRIORITY_FILTER_ALL } from '../constants';
+import { FilterStatus, Priority, type PriorityFilter, type Task } from '../types';
 
 /* ===== Types & Interfaces ===== */
 interface TaskState {
