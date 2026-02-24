@@ -1,0 +1,36 @@
+import { Platform } from 'react-native';
+
+export const CAN_USE_NATIVE_DRIVER = Platform.OS !== 'web';
+
+export const CELEBRATION = {
+	DURATION: 400,
+	SCALE: 1.05
+} as const;
+
+export const CHAR_COUNT = {
+	DANGER_THRESHOLD: 0.95,
+	FONT_SIZE: 12,
+	WARNING_THRESHOLD: 0.8
+} as const;
+
+export const LAYOUT = {
+	MAX_WIDTH: 600
+} as const;
+
+export const PRIORITY_FILTER_ALL = 'all';
+
+export const PROGRESS = {
+	ANIMATION_DURATION: 500,
+	BAR_HEIGHT: 6
+} as const;
+
+export const TASK_TEXT_MAX_LENGTH = 1000;
+
+export const TOAST = {
+	ANIMATION_DURATION: 300,
+	AUTO_DISMISS_DURATION: 4000,
+	BOTTOM_OFFSET: 32,
+	MESSAGE_DELETED: 'Task deleted',
+	TRANSLATE_Y_HIDDEN: 100,
+	UNDO_LABEL: 'UNDO'
+} as const;

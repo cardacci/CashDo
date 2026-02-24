@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.expo/
+.claude/
+package-lock.json

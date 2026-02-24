@@ -1,0 +1,35 @@
+{
+	"expo": {
+		"android": {
+			"adaptiveIcon": {
+				"backgroundColor": "#ffffff",
+				"foregroundImage": "./assets/adaptive-icon.png"
+			},
+			"edgeToEdgeEnabled": true,
+			"predictiveBackGestureEnabled": false
+		},
+		"experiments": {
+			"baseUrl": "/CashDo"
+		},
+		"icon": "./assets/icon.png",
+		"ios": {
+			"supportsTablet": true
+		},
+		"name": "CashDo",
+		"newArchEnabled": true,
+		"orientation": "portrait",
+		"plugins": ["expo-font"],
+		"slug": "CashDo",
+		"splash": {
+			"backgroundColor": "#ffffff",
+			"image": "./assets/splash-icon.png",
+			"resizeMode": "contain"
+		},
+		"userInterfaceStyle": "light",
+		"version": "1.0.0",
+		"web": {
+			"bundler": "metro",
+			"favicon": "./assets/favicon.png"
+		}
+	}
+}
