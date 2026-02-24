@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
 import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
-import { CELEBRATION, PROGRESS } from '../constants';
+import { CAN_USE_NATIVE_DRIVER, CELEBRATION, PROGRESS } from '../constants';
 
 /* ===== Component ===== */
 export function TaskCounter() {
@@ -43,18 +43,18 @@ export function TaskCounter() {
 					Animated.timing(celebrationScaleAnim, {
 						duration: CELEBRATION.DURATION / 2,
 						toValue: CELEBRATION.SCALE,
-						useNativeDriver: true
+						useNativeDriver: CAN_USE_NATIVE_DRIVER
 					}),
 					Animated.timing(celebrationScaleAnim, {
 						duration: CELEBRATION.DURATION / 2,
 						toValue: 1,
-						useNativeDriver: true
+						useNativeDriver: CAN_USE_NATIVE_DRIVER
 					})
 				]),
 				Animated.timing(celebrationOpacityAnim, {
 					duration: CELEBRATION.DURATION,
 					toValue: 1,
-					useNativeDriver: true
+					useNativeDriver: CAN_USE_NATIVE_DRIVER
 				})
 			]).start();
 		} else if (!isAllCompleted) {

@@ -3,7 +3,7 @@ import { Animated, Pressable, ScrollView, StyleSheet, Text, TextInput, View } fr
 import { useTaskStore } from '../store/useTaskStore';
 import { useUndoStore } from '../store/useUndoStore';
 import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
-import { CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
+import { CAN_USE_NATIVE_DRIVER, CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
 import { Priority, type Task } from '../types';
 import { formatDateTime } from '../utils/formatDateTime';
 
@@ -67,7 +67,7 @@ function TaskItemComponent({ task }: TaskItemProps) {
 	}
 
 	function handleDelete() {
-		Animated.timing(opacityAnim, { duration: ANIMATION_DURATION_EXIT, toValue: 0, useNativeDriver: true }).start(() => {
+		Animated.timing(opacityAnim, { duration: ANIMATION_DURATION_EXIT, toValue: 0, useNativeDriver: CAN_USE_NATIVE_DRIVER }).start(() => {
 			setPendingDelete(task);
 			deleteTask(task.id);
 		});
@@ -85,8 +85,8 @@ function TaskItemComponent({ task }: TaskItemProps) {
 			editTask(task.id, trimmed);
 
 			Animated.sequence([
-				Animated.timing(scaleAnim, { duration: ANIMATION_DURATION_EDIT, toValue: 1.03, useNativeDriver: true }),
-				Animated.timing(scaleAnim, { duration: ANIMATION_DURATION_EDIT, toValue: 1, useNativeDriver: true })
+				Animated.timing(scaleAnim, { duration: ANIMATION_DURATION_EDIT, toValue: 1.03, useNativeDriver: CAN_USE_NATIVE_DRIVER }),
+				Animated.timing(scaleAnim, { duration: ANIMATION_DURATION_EDIT, toValue: 1, useNativeDriver: CAN_USE_NATIVE_DRIVER })
 			]).start();
 		}
 
@@ -96,7 +96,7 @@ function TaskItemComponent({ task }: TaskItemProps) {
 	/* ===== Effects ===== */
 	useEffect(() => {
 		if (isNew) {
-			Animated.timing(opacityAnim, { duration: ANIMATION_DURATION_ENTRY, toValue: 1, useNativeDriver: true }).start();
+			Animated.timing(opacityAnim, { duration: ANIMATION_DURATION_ENTRY, toValue: 1, useNativeDriver: CAN_USE_NATIVE_DRIVER }).start();
 		}
 	}, [isNew, opacityAnim]);
 

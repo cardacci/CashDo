@@ -1,3 +1,7 @@
+import { Platform } from 'react-native';
+
+export const CAN_USE_NATIVE_DRIVER = Platform.OS !== 'web';
+
 export const CELEBRATION = {
 	DURATION: 400,
 	SCALE: 1.05
@@ -7,6 +11,10 @@ export const CHAR_COUNT = {
 	DANGER_THRESHOLD: 0.95,
 	FONT_SIZE: 12,
 	WARNING_THRESHOLD: 0.8
+} as const;
+
+export const LAYOUT = {
+	MAX_WIDTH: 600
 } as const;
 
 export const PRIORITY_FILTER_ALL = 'all';

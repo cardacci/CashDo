@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
-import { TOAST } from '../constants';
+import { CAN_USE_NATIVE_DRIVER, TOAST } from '../constants';
 import { useTaskStore } from '../store/useTaskStore';
 import { useUndoStore } from '../store/useUndoStore';
 import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
@@ -48,7 +48,7 @@ export function UndoToast() {
 		Animated.timing(translateY, {
 			duration: TOAST.ANIMATION_DURATION,
 			toValue: TOAST.TRANSLATE_Y_HIDDEN,
-			useNativeDriver: true
+			useNativeDriver: CAN_USE_NATIVE_DRIVER
 		}).start(() => {
 			clearPendingDelete();
 		});
@@ -64,7 +64,7 @@ export function UndoToast() {
 		Animated.timing(translateY, {
 			duration: TOAST.ANIMATION_DURATION,
 			toValue: TOAST.TRANSLATE_Y_HIDDEN,
-			useNativeDriver: true
+			useNativeDriver: CAN_USE_NATIVE_DRIVER
 		}).start(() => {
 			clearPendingDelete();
 		});
@@ -76,7 +76,7 @@ export function UndoToast() {
 			Animated.timing(translateY, {
 				duration: TOAST.ANIMATION_DURATION,
 				toValue: 0,
-				useNativeDriver: true
+				useNativeDriver: CAN_USE_NATIVE_DRIVER
 			}).start();
 
 			clearTimer();

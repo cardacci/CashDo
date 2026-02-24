@@ -12,6 +12,7 @@ import { TaskItem } from './src/components/TaskItem';
 import { UndoToast } from './src/components/UndoToast';
 import { useFilteredTasks } from './src/hooks/useFilteredTasks';
 import { useTaskStore } from './src/store/useTaskStore';
+import { LAYOUT } from './src/constants';
 import { darkTheme, fonts, lightTheme } from './src/theme';
 import { StatusBarTheme, type Task } from './src/types';
 
@@ -58,49 +59,53 @@ export default function App() {
 			<SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
 				<StatusBar style={darkMode ? StatusBarTheme.Light : StatusBarTheme.Dark} />
 
-				<View style={styles.container}>
-					{/* Header */}
-					<View style={[styles.header, { backgroundColor: theme.accent }]}>
-						<Text style={[styles.title, { color: theme.accentText, fontFamily: fonts.heading }]}>CashDo</Text>
+				<View style={styles.appWrapper}>
+					<View style={styles.container}>
+						{/* Header */}
+						<View style={[styles.header, { backgroundColor: theme.accent }]}>
+							<Text style={[styles.title, { color: theme.accentText, fontFamily: fonts.heading }]}>CashDo</Text>
 
-						<Pressable onPress={toggleDarkMode} style={[styles.themeToggle, { backgroundColor: theme.accentText }]}>
-							<Text style={styles.themeToggleText}>{darkMode ? '☀️' : '🌙'}</Text>
-						</Pressable>
+							<Pressable onPress={toggleDarkMode} style={[styles.themeToggle, { backgroundColor: theme.accentText }]}>
+								<Text style={styles.themeToggleText}>{darkMode ? '☀️' : '🌙'}</Text>
+							</Pressable>
+						</View>
+
+						<View style={styles.content}>
+							{/* Task Counter */}
+							<TaskCounter />
+
+							{/* Task Input */}
+							<TaskInput />
+
+							{/* Filters */}
+							<FilterBar />
+
+							<PriorityFilter />
+
+							{/* Task List */}
+							<FlatList
+								ListEmptyComponent={
+									<View style={styles.emptyContainer}>
+										<Text style={[styles.emptyText, { color: theme.textSecondary, fontFamily: fonts.headingSemiBold }]}>
+											No tasks found
+										</Text>
+										<Text style={[styles.emptySubtext, { color: theme.textSecondary, fontFamily: fonts.body }]}>
+											Add a task above to get started
+										</Text>
+									</View>
+								}
+								contentContainerStyle={styles.listContent}
+								data={filteredTasks}
+								keyExtractor={keyExtractor}
+								renderItem={renderItem}
+								showsVerticalScrollIndicator={false}
+								style={styles.list}
+							/>
+						</View>
 					</View>
 
-					<View style={styles.content}>
-						{/* Task Counter */}
-						<TaskCounter />
-
-						{/* Task Input */}
-						<TaskInput />
-
-						{/* Filters */}
-						<FilterBar />
-
-						<PriorityFilter />
-
-						{/* Task List */}
-						<FlatList
-							ListEmptyComponent={
-								<View style={styles.emptyContainer}>
-									<Text style={[styles.emptyText, { color: theme.textSecondary, fontFamily: fonts.headingSemiBold }]}>No tasks found</Text>
-									<Text style={[styles.emptySubtext, { color: theme.textSecondary, fontFamily: fonts.body }]}>
-										Add a task above to get started
-									</Text>
-								</View>
-							}
-							contentContainerStyle={styles.listContent}
-							data={filteredTasks}
-							keyExtractor={keyExtractor}
-							renderItem={renderItem}
-							showsVerticalScrollIndicator={false}
-							style={styles.list}
-						/>
-					</View>
+					<UndoToast />
 				</View>
-
-				<UndoToast />
 			</SafeAreaView>
 		</SafeAreaProvider>
 	);
@@ -108,6 +113,12 @@ export default function App() {
 
 /* ===== Styles ===== */
 const styles = StyleSheet.create({
+	appWrapper: {
+		alignSelf: 'center',
+		flex: 1,
+		maxWidth: LAYOUT.MAX_WIDTH,
+		width: '100%'
+	},
 	container: {
 		flex: 1
 	},
