@@ -6,6 +6,7 @@ import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Tex
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { FilterBar } from './src/components/FilterBar';
 import { PriorityFilter } from './src/components/PriorityFilter';
+import { StorageErrorModal } from './src/components/StorageErrorModal';
 import { TaskCounter } from './src/components/TaskCounter';
 import { TaskInput } from './src/components/TaskInput';
 import { TaskItem } from './src/components/TaskItem';
@@ -140,6 +141,8 @@ export default function App() {
 						</View>
 
 						<UndoToast />
+
+						<StorageErrorModal />
 					</View>
 				</SafeAreaView>
 			</SafeAreaView>

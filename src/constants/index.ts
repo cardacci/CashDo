@@ -24,6 +24,16 @@ export const PROGRESS = {
 	BAR_HEIGHT: 6
 } as const;
 
+export const STORAGE_ERROR = {
+	BUTTON_CONTINUE: 'Continue',
+	BUTTON_DISMISS: 'Dismiss',
+	BUTTON_RETRY: 'Retry',
+	MESSAGE_READ: 'There was a problem reading your saved data.',
+	MESSAGE_WRITE: 'Your changes may not be saved. Please try again.',
+	TITLE_READ: 'Could not load your data',
+	TITLE_WRITE: 'Could not save your changes'
+} as const;
+
 export const TASK_LIST_REFRESH_DELAY = 500;
 
 export const TASK_TEXT_MAX_LENGTH = 1000;

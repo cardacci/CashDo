@@ -1,9 +1,14 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { generateId } from '../utils/generateId';
 import { PRIORITY_FILTER_ALL } from '../constants';
-import { FilterStatus, Priority, type PriorityFilter, type Task } from '../types';
+import { FilterStatus, Priority, StorageErrorType, type PriorityFilter, type Task } from '../types';
+import { createSafeStorage } from '../utils/createSafeStorage';
+import { generateId } from '../utils/generateId';
+import { useErrorStore } from './useErrorStore';
+
+/* ===== Constants ===== */
+const STORAGE_KEY = 'cashdo-storage';
+const UNKNOWN_ERROR_MESSAGE = 'Unknown error';
 
 /* ===== Types & Interfaces ===== */
 interface TaskState {
@@ -22,6 +27,7 @@ interface TaskState {
 	toggleTask: (id: string) => void;
 }
 
+/* ===== Store ===== */
 export const useTaskStore = create<TaskState>()(
 	persist(
 		(set) => ({
@@ -76,11 +82,14 @@ export const useTaskStore = create<TaskState>()(
 				}))
 		}),
 		{
-			name: 'cashdo-storage',
+			name: STORAGE_KEY,
 			onRehydrateStorage: () => {
 				return (state, error) => {
 					if (error) {
-						console.error('Error rehydrating state:', error);
+						useErrorStore.getState().setStorageError({
+							message: error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE,
+							type: StorageErrorType.Rehydration
+						});
 					}
 
 					if (state) {
@@ -92,7 +101,7 @@ export const useTaskStore = create<TaskState>()(
 				darkMode: state.darkMode,
 				tasks: state.tasks
 			}),
-			storage: createJSONStorage(() => AsyncStorage)
+			storage: createJSONStorage(() => createSafeStorage())
 		}
 	)
 );

@@ -67,6 +67,17 @@ Or try it live at [https://cardacci.github.io/CashDo](https://cardacci.github.io
 - **TypeScript-first:** Full type inference with no extra configuration.
 - **Scalable simplicity:** The project uses two focused stores (`useTaskStore` for tasks and `useUndoStore` for undo functionality), keeping each store small and testable.
 
+## Error Handling
+
+AsyncStorage errors are handled gracefully through a dedicated error modal. When a read or write operation fails, the user is notified with a clear message and actionable options.
+
+| Scenario            | Modal                                                                                             |
+| ------------------- | ------------------------------------------------------------------------------------------------- |
+| Data failed to load | <img src="docs/assets/could-not-load-your-data.jpg" alt="Could not load your data" width="240" /> |
+
+- **Rehydration errors** (data failed to load): the modal offers a **Retry** button to attempt rehydration again, and a **Continue** button to start with a fresh state.
+- **Write errors** (changes failed to save): the modal shows a **Dismiss** button. The next state change will automatically retry the write.
+
 ## Assumptions & Trade-offs
 
 - **Local-only storage:** AsyncStorage was used as the persistence layer. There is no backend or API; all data lives on the device/browser (localStorage on web).

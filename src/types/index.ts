@@ -13,6 +13,11 @@ export enum Priority {
 	Medium = 'medium'
 }
 
+export enum StorageErrorType {
+	Rehydration = 'rehydration',
+	Write = 'write'
+}
+
 export enum StatusBarTheme {
 	Dark = 'dark',
 	Light = 'light'
