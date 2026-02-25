@@ -49,16 +49,16 @@ export function PriorityFilter() {
 const styles = StyleSheet.create({
 	container: {
 		flexDirection: 'row',
-		gap: 8,
-		marginBottom: 16
+		gap: 6,
+		marginBottom: 10
 	},
 	filterButton: {
-		borderRadius: 8,
+		borderRadius: 6,
 		flex: 1,
-		paddingVertical: 10
+		paddingVertical: 6
 	},
 	filterText: {
-		fontSize: 13,
+		fontSize: 12,
 		textAlign: 'center'
 	}
 });

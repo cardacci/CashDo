@@ -13,6 +13,8 @@ export const CHAR_COUNT = {
 	WARNING_THRESHOLD: 0.8
 } as const;
 
+export const KEYBOARD_SCROLL_DELAY = 300;
+
 export const LAYOUT = {
 	MAX_WIDTH: 600
 } as const;

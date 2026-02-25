@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
 import { useTheme } from '../hooks/useTheme';
 import { useTaskStore } from '../store/useTaskStore';
@@ -63,6 +63,7 @@ export function TaskInput() {
 		addTask(trimmed, priority);
 		setText('');
 		setPriority(Priority.Medium);
+		Keyboard.dismiss();
 	}
 
 	/* ===== Render ===== */
@@ -70,12 +71,15 @@ export function TaskInput() {
 		<View style={dynamicStyles.container}>
 			<View style={styles.inputWrapper}>
 				<TextInput
+					autoComplete="off"
+					autoCorrect={false}
 					maxLength={TASK_TEXT_MAX_LENGTH}
 					onChangeText={setText}
 					onSubmitEditing={handleAddTask}
 					placeholder="What needs to be done?"
 					placeholderTextColor={theme.textSecondary}
 					returnKeyType="done"
+					spellCheck={false}
 					style={[dynamicStyles.input, showClearButton && styles.inputWithClear, { fontFamily: fonts.body }]}
 					value={text}
 				/>

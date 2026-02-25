@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Animated, Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { CAN_USE_NATIVE_DRIVER, CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
 import { useTheme } from '../hooks/useTheme';
 import { useTaskStore } from '../store/useTaskStore';
@@ -22,14 +22,17 @@ const PRIORITY_LABELS: Record<Priority, string> = {
 
 /* ===== Types ===== */
 interface TaskItemProps {
+	onEditStart?: () => void;
 	task: Task;
 }
 
 /* ===== Component ===== */
-function TaskItemComponent({ task }: TaskItemProps) {
+function TaskItemComponent({ onEditStart, task }: TaskItemProps) {
 	/* ===== Store ===== */
 	const deleteTask = useTaskStore((state) => state.deleteTask);
+	const editingTaskId = useTaskStore((state) => state.editingTaskId);
 	const editTask = useTaskStore((state) => state.editTask);
+	const setEditingTaskId = useTaskStore((state) => state.setEditingTaskId);
 	const toggleTask = useTaskStore((state) => state.toggleTask);
 	const setPendingDelete = useUndoStore((state) => state.setPendingDelete);
 
@@ -38,7 +41,9 @@ function TaskItemComponent({ task }: TaskItemProps) {
 
 	/* ===== State ===== */
 	const [editText, setEditText] = useState(task.text);
-	const [isEditing, setIsEditing] = useState(false);
+
+	/* ===== Derived Values ===== */
+	const isEditing = editingTaskId === task.id;
 
 	/* ===== Refs ===== */
 	const isNew = useRef(Date.now() - task.createdAt < RECENTLY_CREATED_THRESHOLD).current;
@@ -63,7 +68,8 @@ function TaskItemComponent({ task }: TaskItemProps) {
 
 	function handleCancelEdit() {
 		setEditText(task.text);
-		setIsEditing(false);
+		Keyboard.dismiss();
+		setEditingTaskId(null);
 	}
 
 	function handleDelete() {
@@ -75,7 +81,8 @@ function TaskItemComponent({ task }: TaskItemProps) {
 
 	function handleEdit() {
 		setEditText(task.text);
-		setIsEditing(true);
+		setEditingTaskId(task.id);
+		onEditStart?.();
 	}
 
 	function handleSaveEdit() {
@@ -90,7 +97,8 @@ function TaskItemComponent({ task }: TaskItemProps) {
 			]).start();
 		}
 
-		setIsEditing(false);
+		Keyboard.dismiss();
+		setEditingTaskId(null);
 	}
 
 	/* ===== Effects ===== */
@@ -121,11 +129,14 @@ function TaskItemComponent({ task }: TaskItemProps) {
 					<>
 						<View style={styles.editRow}>
 							<TextInput
+								autoComplete="off"
+								autoCorrect={false}
 								autoFocus
 								maxLength={TASK_TEXT_MAX_LENGTH}
-								multiline
 								onChangeText={setEditText}
 								onSubmitEditing={handleSaveEdit}
+								returnKeyType="done"
+								spellCheck={false}
 								style={[dynamicStyles.editInput, { fontFamily: fonts.body }]}
 								value={editText}
 							/>
@@ -141,9 +152,11 @@ function TaskItemComponent({ task }: TaskItemProps) {
 							</View>
 						</View>
 
-						<Text style={[styles.editCharCount, { color: editCharCountColor, fontFamily: fonts.body, opacity: showEditCharCount ? 1 : 0 }]}>
-							{editText.length}/{TASK_TEXT_MAX_LENGTH}
-						</Text>
+						{showEditCharCount && (
+							<Text style={[styles.editCharCount, { color: editCharCountColor, fontFamily: fonts.body }]}>
+								{editText.length}/{TASK_TEXT_MAX_LENGTH}
+							</Text>
+						)}
 					</>
 				) : (
 					<Pressable onLongPress={handleEdit}>
@@ -199,13 +212,14 @@ function createDynamicStyles(theme: ThemeColors) {
 		editInput: {
 			backgroundColor: theme.inputBackground,
 			borderColor: theme.border,
-			borderRadius: 8,
+			borderRadius: 6,
 			borderWidth: 1,
 			color: theme.text,
 			flex: 1,
-			fontSize: 14,
-			paddingHorizontal: 10,
-			paddingVertical: 6
+			fontSize: 13,
+			height: 32,
+			paddingHorizontal: 8,
+			paddingVertical: 0
 		},
 		taskText: {
 			color: theme.text,
@@ -265,8 +279,8 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold'
 	},
 	editActions: {
-		gap: 6,
-		justifyContent: 'center'
+		flexDirection: 'row',
+		gap: 6
 	},
 	editCharCount: {
 		fontSize: CHAR_COUNT.FONT_SIZE,

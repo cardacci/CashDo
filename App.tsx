@@ -1,8 +1,8 @@
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { useFonts, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { FilterBar } from './src/components/FilterBar';
 import { PriorityFilter } from './src/components/PriorityFilter';
@@ -14,7 +14,7 @@ import { UndoToast } from './src/components/UndoToast';
 import { useFilteredTasks } from './src/hooks/useFilteredTasks';
 import { useTheme } from './src/hooks/useTheme';
 import { useTaskStore } from './src/store/useTaskStore';
-import { LAYOUT, PRIORITY_FILTER_ALL, TASK_LIST_REFRESH_DELAY } from './src/constants';
+import { KEYBOARD_SCROLL_DELAY, LAYOUT, PRIORITY_FILTER_ALL, TASK_LIST_REFRESH_DELAY } from './src/constants';
 import { fonts } from './src/theme';
 import { FilterStatus, StatusBarTheme, type Task } from './src/types';
 
@@ -45,6 +45,9 @@ export default function App() {
 	/* ===== State ===== */
 	const [refreshing, setRefreshing] = useState(false);
 
+	/* ===== Refs ===== */
+	const flatListRef = useRef<FlatList<Task>>(null);
+
 	/* ===== Derived Values ===== */
 	const hasFiltersActive = filterStatus !== FilterStatus.All || priorityFilter !== PRIORITY_FILTER_ALL;
 	const isFilteredEmpty = tasks.length > 0 && filteredTasks.length === 0 && hasFiltersActive;
@@ -61,7 +64,19 @@ export default function App() {
 	}
 
 	/* ===== Callbacks ===== */
-	const renderItem = useCallback(({ item }: { item: Task }) => <TaskItem task={item} />, []);
+	const renderItem = useCallback(
+		({ item, index }: { item: Task; index: number }) => (
+			<TaskItem
+				onEditStart={() => {
+					setTimeout(() => {
+						flatListRef.current?.scrollToIndex({ animated: true, index, viewPosition: 0.1 });
+					}, KEYBOARD_SCROLL_DELAY);
+				}}
+				task={item}
+			/>
+		),
+		[]
+	);
 
 	const keyExtractor = useCallback((item: Task) => item.id, []);
 
@@ -84,7 +99,7 @@ export default function App() {
 
 				<SafeAreaView edges={['bottom', 'left', 'right']} style={[styles.safeArea, { backgroundColor: theme.background }]}>
 					<View style={styles.appWrapper}>
-						<View style={styles.container}>
+						<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
 							{/* Header */}
 							<View style={[styles.header, { backgroundColor: theme.accent }]}>
 								<Text style={[styles.title, { color: theme.accentText, fontFamily: fonts.heading }]}>CashDo</Text>
@@ -130,6 +145,8 @@ export default function App() {
 									contentContainerStyle={styles.listContent}
 									data={filteredTasks}
 									keyExtractor={keyExtractor}
+									keyboardDismissMode="on-drag"
+									ref={flatListRef}
 									refreshControl={
 										<RefreshControl colors={[theme.accent]} onRefresh={onRefresh} refreshing={refreshing} tintColor={theme.accent} />
 									}
@@ -138,7 +155,7 @@ export default function App() {
 									style={styles.list}
 								/>
 							</View>
-						</View>
+						</KeyboardAvoidingView>
 
 						<UndoToast />
 

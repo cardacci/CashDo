@@ -16,10 +16,12 @@ interface TaskState {
 	darkMode: boolean;
 	deleteTask: (id: string) => void;
 	editTask: (id: string, text: string) => void;
+	editingTaskId: string | null;
 	filterStatus: FilterStatus;
 	isHydrated: boolean;
 	priorityFilter: PriorityFilter;
 	restoreTask: (task: Task) => void;
+	setEditingTaskId: (id: string | null) => void;
 	setFilterStatus: (status: FilterStatus) => void;
 	setPriorityFilter: (priority: PriorityFilter) => void;
 	tasks: Task[];
@@ -57,6 +59,8 @@ export const useTaskStore = create<TaskState>()(
 					tasks: state.tasks.map((task) => (task.id === id ? { ...task, text } : task))
 				})),
 
+			editingTaskId: null,
+
 			filterStatus: FilterStatus.All,
 
 			isHydrated: false,
@@ -67,6 +71,8 @@ export const useTaskStore = create<TaskState>()(
 				set((state) => ({
 					tasks: [...state.tasks, task]
 				})),
+
+			setEditingTaskId: (editingTaskId: string | null) => set({ editingTaskId }),
 
 			setFilterStatus: (filterStatus: FilterStatus) => set({ filterStatus }),
 
