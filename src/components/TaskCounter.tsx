@@ -1,18 +1,20 @@
 import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
-import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
+import { useTheme } from '../hooks/useTheme';
+import { fonts, type ThemeColors } from '../theme';
 import { CAN_USE_NATIVE_DRIVER, CELEBRATION, PROGRESS } from '../constants';
 
 /* ===== Component ===== */
 export function TaskCounter() {
 	/* ===== Store ===== */
-	const darkMode = useTaskStore((state) => state.darkMode);
 	const tasks = useTaskStore((state) => state.tasks);
+
+	/* ===== Hooks ===== */
+	const theme = useTheme();
 
 	/* ===== Derived Values ===== */
 	const completedCount = tasks.filter((task) => task.completed).length;
-	const theme = darkMode ? darkTheme : lightTheme;
 	const dynamicStyles = createDynamicStyles(theme);
 	const totalCount = tasks.length;
 	const isAllCompleted = totalCount > 0 && completedCount === totalCount;

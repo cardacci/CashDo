@@ -11,9 +11,10 @@ import { TaskInput } from './src/components/TaskInput';
 import { TaskItem } from './src/components/TaskItem';
 import { UndoToast } from './src/components/UndoToast';
 import { useFilteredTasks } from './src/hooks/useFilteredTasks';
+import { useTheme } from './src/hooks/useTheme';
 import { useTaskStore } from './src/store/useTaskStore';
 import { LAYOUT, PRIORITY_FILTER_ALL, TASK_LIST_REFRESH_DELAY } from './src/constants';
-import { darkTheme, fonts, lightTheme } from './src/theme';
+import { fonts } from './src/theme';
 import { FilterStatus, StatusBarTheme, type Task } from './src/types';
 
 /* ===== Component ===== */
@@ -38,6 +39,7 @@ export default function App() {
 		Poppins_600SemiBold,
 		Poppins_700Bold
 	});
+	const theme = useTheme();
 
 	/* ===== State ===== */
 	const [refreshing, setRefreshing] = useState(false);
@@ -45,7 +47,6 @@ export default function App() {
 	/* ===== Derived Values ===== */
 	const hasFiltersActive = filterStatus !== FilterStatus.All || priorityFilter !== PRIORITY_FILTER_ALL;
 	const isFilteredEmpty = tasks.length > 0 && filteredTasks.length === 0 && hasFiltersActive;
-	const theme = darkMode ? darkTheme : lightTheme;
 
 	/* ===== Functions ===== */
 	function onRefresh() {

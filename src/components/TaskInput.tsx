@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useTaskStore } from '../store/useTaskStore';
-import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
 import { CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
+import { useTheme } from '../hooks/useTheme';
+import { useTaskStore } from '../store/useTaskStore';
+import { fonts, type ThemeColors } from '../theme';
 import { Priority } from '../types';
 
 /* ===== Constants ===== */
@@ -21,14 +22,15 @@ const PRIORITY_LABELS: Record<Priority, string> = {
 export function TaskInput() {
 	/* ===== Store ===== */
 	const addTask = useTaskStore((state) => state.addTask);
-	const darkMode = useTaskStore((state) => state.darkMode);
+
+	/* ===== Hooks ===== */
+	const theme = useTheme();
 
 	/* ===== State ===== */
 	const [priority, setPriority] = useState<Priority>(Priority.Medium);
 	const [text, setText] = useState('');
 
 	/* ===== Derived Values ===== */
-	const theme = darkMode ? darkTheme : lightTheme;
 	const dynamicStyles = createDynamicStyles(theme);
 	const charRatio = text.length / TASK_TEXT_MAX_LENGTH;
 	const showCharCount = charRatio >= CHAR_COUNT.WARNING_THRESHOLD;

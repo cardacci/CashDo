@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { CAN_USE_NATIVE_DRIVER, CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
+import { useTheme } from '../hooks/useTheme';
 import { useTaskStore } from '../store/useTaskStore';
 import { useUndoStore } from '../store/useUndoStore';
-import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
-import { CAN_USE_NATIVE_DRIVER, CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
+import { fonts, type ThemeColors } from '../theme';
 import { Priority, type Task } from '../types';
 import { formatDateTime } from '../utils/formatDateTime';
 
@@ -27,11 +28,13 @@ interface TaskItemProps {
 /* ===== Component ===== */
 function TaskItemComponent({ task }: TaskItemProps) {
 	/* ===== Store ===== */
-	const darkMode = useTaskStore((state) => state.darkMode);
 	const deleteTask = useTaskStore((state) => state.deleteTask);
 	const editTask = useTaskStore((state) => state.editTask);
 	const toggleTask = useTaskStore((state) => state.toggleTask);
 	const setPendingDelete = useUndoStore((state) => state.setPendingDelete);
+
+	/* ===== Hooks ===== */
+	const theme = useTheme();
 
 	/* ===== State ===== */
 	const [editText, setEditText] = useState(task.text);
@@ -41,9 +44,6 @@ function TaskItemComponent({ task }: TaskItemProps) {
 	const isNew = useRef(Date.now() - task.createdAt < RECENTLY_CREATED_THRESHOLD).current;
 	const opacityAnim = useRef(new Animated.Value(isNew ? 0 : 1)).current;
 	const scaleAnim = useRef(new Animated.Value(1)).current;
-
-	/* ===== Derived Values ===== */
-	const theme = darkMode ? darkTheme : lightTheme;
 	const dynamicStyles = createDynamicStyles(theme);
 	const editCharRatio = editText.length / TASK_TEXT_MAX_LENGTH;
 	const editCharCountColor = editCharRatio >= CHAR_COUNT.DANGER_THRESHOLD ? theme.danger : theme.textSecondary;

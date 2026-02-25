@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useTaskStore } from '../store/useTaskStore';
-import { darkTheme, fonts, lightTheme } from '../theme';
 import { PRIORITY_FILTER_ALL } from '../constants';
+import { useTheme } from '../hooks/useTheme';
+import { useTaskStore } from '../store/useTaskStore';
+import { fonts } from '../theme';
 import { Priority, type PriorityFilter as PriorityFilterType } from '../types';
 
 /* ===== Constants ===== */
@@ -15,12 +16,11 @@ const PRIORITY_OPTIONS: { color: string; key: PriorityFilterType; label: string 
 /* ===== Component ===== */
 export function PriorityFilter() {
 	/* ===== Store ===== */
-	const darkMode = useTaskStore((state) => state.darkMode);
 	const priorityFilter = useTaskStore((state) => state.priorityFilter);
 	const setPriorityFilter = useTaskStore((state) => state.setPriorityFilter);
 
-	/* ===== Derived Values ===== */
-	const theme = darkMode ? darkTheme : lightTheme;
+	/* ===== Hooks ===== */
+	const theme = useTheme();
 
 	/* ===== Render ===== */
 	return (

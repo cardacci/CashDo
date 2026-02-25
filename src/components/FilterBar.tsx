@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '../hooks/useTheme';
 import { useTaskStore } from '../store/useTaskStore';
-import { darkTheme, fonts, lightTheme } from '../theme';
+import { fonts } from '../theme';
 import { FilterStatus } from '../types';
 
 /* ===== Constants ===== */
@@ -13,12 +14,11 @@ const FILTERS: { key: FilterStatus; label: string }[] = [
 /* ===== Component ===== */
 export function FilterBar() {
 	/* ===== Store ===== */
-	const darkMode = useTaskStore((state) => state.darkMode);
 	const filterStatus = useTaskStore((state) => state.filterStatus);
 	const setFilterStatus = useTaskStore((state) => state.setFilterStatus);
 
-	/* ===== Derived Values ===== */
-	const theme = darkMode ? darkTheme : lightTheme;
+	/* ===== Hooks ===== */
+	const theme = useTheme();
 
 	/* ===== Render ===== */
 	return (
