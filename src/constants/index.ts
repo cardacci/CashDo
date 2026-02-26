@@ -12,8 +12,9 @@ export const API = {
 } as const;
 
 export const API_ERROR = {
-	MESSAGE: 'Could not reach the server. Your data is saved locally.',
-	TITLE: 'Sync failed'
+	BUTTON: 'Got it',
+	MESSAGE: 'Your data is saved on this device. Changes will sync automatically when the connection is back.',
+	TITLE: 'Working offline'
 } as const;
 
 export const CAN_USE_NATIVE_DRIVER = Platform.OS !== 'web';

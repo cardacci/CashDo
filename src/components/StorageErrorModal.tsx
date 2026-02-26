@@ -9,7 +9,7 @@ import { StorageErrorType } from '../types';
 /* ===== Types ===== */
 type ButtonAction = 'dismiss' | 'retry';
 
-type ButtonVariant = 'primary' | 'secondary';
+type ButtonVariant = 'brand' | 'danger' | 'secondary';
 
 interface ErrorButtonConfig {
 	action: ButtonAction;
@@ -18,15 +18,16 @@ interface ErrorButtonConfig {
 }
 
 interface ErrorConfig {
-	buttons: ErrorButtonConfig[];
+	buttons: ErrorButtonConfig[]; // Array to support multiple buttons (e.g., retry + dismiss)
+	icon: string;
 	message: string;
+	showDetail: boolean;
 	title: string;
 }
 
 /* ===== Constants ===== */
 const OVERLAY_COLOR = 'rgba(0, 0, 0, 0.5)';
-const ERROR_ICON = '⚠';
-const ERROR_ICON_SIZE = 32;
+const ICON_SIZE = 32;
 const MODAL_BORDER_RADIUS = 16;
 const MODAL_MAX_WIDTH = 340;
 const MODAL_PADDING = 24;
@@ -40,21 +41,27 @@ const DETAIL_FONT_SIZE = 12;
 
 const ERROR_CONFIG: Record<StorageErrorType, ErrorConfig> = {
 	[StorageErrorType.Api]: {
-		buttons: [{ action: 'dismiss', label: STORAGE_ERROR.BUTTON_DISMISS, variant: 'primary' }],
+		buttons: [{ action: 'dismiss', label: API_ERROR.BUTTON, variant: 'brand' }],
+		icon: '☁️',
 		message: API_ERROR.MESSAGE,
+		showDetail: false,
 		title: API_ERROR.TITLE
 	},
 	[StorageErrorType.Rehydration]: {
 		buttons: [
-			{ action: 'retry', label: STORAGE_ERROR.BUTTON_RETRY, variant: 'primary' },
+			{ action: 'retry', label: STORAGE_ERROR.BUTTON_RETRY, variant: 'danger' },
 			{ action: 'dismiss', label: STORAGE_ERROR.BUTTON_CONTINUE, variant: 'secondary' }
 		],
+		icon: '⚠',
 		message: STORAGE_ERROR.MESSAGE_READ,
+		showDetail: true,
 		title: STORAGE_ERROR.TITLE_READ
 	},
 	[StorageErrorType.Write]: {
-		buttons: [{ action: 'dismiss', label: STORAGE_ERROR.BUTTON_DISMISS, variant: 'primary' }],
+		buttons: [{ action: 'dismiss', label: STORAGE_ERROR.BUTTON_DISMISS, variant: 'danger' }],
+		icon: '⚠',
 		message: STORAGE_ERROR.MESSAGE_WRITE,
+		showDetail: true,
 		title: STORAGE_ERROR.TITLE_WRITE
 	}
 };
@@ -71,6 +78,18 @@ export function StorageErrorModal() {
 	/* ===== Derived Values ===== */
 	const dynamicStyles = createDynamicStyles(theme);
 	const errorConfig = storageError ? ERROR_CONFIG[storageError.type] : null;
+
+	const buttonVariantStyle: Record<ButtonVariant, object> = {
+		brand: dynamicStyles.brandButton,
+		danger: dynamicStyles.dangerButton,
+		secondary: dynamicStyles.secondaryButton
+	};
+
+	const buttonVariantTextColor: Record<ButtonVariant, string> = {
+		brand: theme.primaryText,
+		danger: theme.dangerText,
+		secondary: theme.text
+	};
 
 	/* ===== Functions ===== */
 	function handleDismiss() {
@@ -96,26 +115,22 @@ export function StorageErrorModal() {
 		<Modal animationType="fade" transparent visible>
 			<View style={styles.overlay}>
 				<View style={dynamicStyles.modal}>
-					<Text style={styles.errorIcon}>{ERROR_ICON}</Text>
+					<Text style={styles.icon}>{errorConfig?.icon}</Text>
 
 					<Text style={[dynamicStyles.title, { fontFamily: fonts.headingSemiBold }]}>{errorConfig?.title}</Text>
 
 					<Text style={[dynamicStyles.message, { fontFamily: fonts.body }]}>{errorConfig?.message}</Text>
 
-					<Text style={[dynamicStyles.detail, { fontFamily: fonts.body }]}>{storageError.message}</Text>
+					{errorConfig?.showDetail && <Text style={[dynamicStyles.detail, { fontFamily: fonts.body }]}>{storageError.message}</Text>}
 
 					<View style={styles.buttonRow}>
 						{errorConfig?.buttons.map((btn) => (
-							<Pressable
-								key={btn.label}
-								onPress={actionHandlers[btn.action]}
-								style={[styles.button, btn.variant === 'primary' ? { backgroundColor: theme.danger } : dynamicStyles.secondaryButton]}
-							>
+							<Pressable key={btn.label} onPress={actionHandlers[btn.action]} style={[styles.button, buttonVariantStyle[btn.variant]]}>
 								<Text
 									style={[
 										styles.buttonText,
 										{
-											color: btn.variant === 'primary' ? theme.dangerText : theme.text,
+											color: buttonVariantTextColor[btn.variant],
 											fontFamily: fonts.bodySemiBold
 										}
 									]}
@@ -148,8 +163,8 @@ const styles = StyleSheet.create({
 	buttonText: {
 		fontSize: BUTTON_FONT_SIZE
 	},
-	errorIcon: {
-		fontSize: ERROR_ICON_SIZE,
+	icon: {
+		fontSize: ICON_SIZE,
 		marginBottom: 12,
 		textAlign: 'center'
 	},
@@ -164,6 +179,12 @@ const styles = StyleSheet.create({
 
 function createDynamicStyles(theme: ThemeColors) {
 	return StyleSheet.create({
+		brandButton: {
+			backgroundColor: theme.primary
+		},
+		dangerButton: {
+			backgroundColor: theme.danger
+		},
 		detail: {
 			color: theme.textSecondary,
 			fontSize: DETAIL_FONT_SIZE,

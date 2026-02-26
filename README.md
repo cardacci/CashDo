@@ -114,7 +114,7 @@ All errors are handled gracefully through a dedicated modal. The user is always 
 
 - **Rehydration errors** (AsyncStorage read failed): the modal offers a **Retry** button to attempt rehydration again, and a **Continue** button to start with a fresh state.
 - **Write errors** (AsyncStorage write failed): the modal shows a **Dismiss** button. The next state change will automatically retry the write.
-- **API sync errors** (server unreachable or request failed): the modal shows a **Dismiss** button. The app continues working from cached data.
+- **API sync errors** (server unreachable or request failed): a friendly "Working offline" modal with a branded **Got it** button reassures the user that their data is saved locally and will sync automatically.
 
 ## Assumptions & Trade-offs
 
