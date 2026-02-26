@@ -13,6 +13,12 @@ export enum Priority {
 	Medium = 'medium'
 }
 
+export enum StorageErrorType {
+	Api = 'api',
+	Rehydration = 'rehydration',
+	Write = 'write'
+}
+
 export enum StatusBarTheme {
 	Dark = 'dark',
 	Light = 'light'
@@ -26,4 +32,5 @@ export interface Task {
 	id: string;
 	priority: Priority;
 	text: string;
+	updatedAt: number;
 }

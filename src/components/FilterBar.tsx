@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '../hooks/useTheme';
 import { useTaskStore } from '../store/useTaskStore';
-import { darkTheme, fonts, lightTheme } from '../theme';
+import { fonts } from '../theme';
 import { FilterStatus } from '../types';
 
 /* ===== Constants ===== */
@@ -13,12 +14,11 @@ const FILTERS: { key: FilterStatus; label: string }[] = [
 /* ===== Component ===== */
 export function FilterBar() {
 	/* ===== Store ===== */
-	const darkMode = useTaskStore((state) => state.darkMode);
 	const filterStatus = useTaskStore((state) => state.filterStatus);
 	const setFilterStatus = useTaskStore((state) => state.setFilterStatus);
 
-	/* ===== Derived Values ===== */
-	const theme = darkMode ? darkTheme : lightTheme;
+	/* ===== Hooks ===== */
+	const theme = useTheme();
 
 	/* ===== Render ===== */
 	return (
@@ -48,16 +48,16 @@ export function FilterBar() {
 const styles = StyleSheet.create({
 	container: {
 		flexDirection: 'row',
-		gap: 8,
-		marginBottom: 8
+		gap: 6,
+		marginBottom: 6
 	},
 	filterButton: {
-		borderRadius: 8,
+		borderRadius: 6,
 		flex: 1,
-		paddingVertical: 10
+		paddingVertical: 6
 	},
 	filterText: {
-		fontSize: 13,
+		fontSize: 12,
 		textAlign: 'center'
 	}
 });

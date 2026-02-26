@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { CAN_USE_NATIVE_DRIVER, TOAST } from '../constants';
+import { useTheme } from '../hooks/useTheme';
 import { useTaskStore } from '../store/useTaskStore';
 import { useUndoStore } from '../store/useUndoStore';
-import { darkTheme, fonts, lightTheme, type ThemeColors } from '../theme';
+import { fonts, type ThemeColors } from '../theme';
 
 /* ===== Constants ===== */
 const TOAST_HORIZONTAL_MARGIN = 16;
@@ -21,17 +22,16 @@ const TOAST_ELEVATION = 6;
 /* ===== Component ===== */
 export function UndoToast() {
 	/* ===== Store ===== */
-	const darkMode = useTaskStore((state) => state.darkMode);
 	const restoreTask = useTaskStore((state) => state.restoreTask);
 	const clearPendingDelete = useUndoStore((state) => state.clearPendingDelete);
 	const pendingDelete = useUndoStore((state) => state.pendingDelete);
 
+	/* ===== Hooks ===== */
+	const theme = useTheme();
+
 	/* ===== Refs ===== */
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const translateY = useRef(new Animated.Value(TOAST.TRANSLATE_Y_HIDDEN)).current;
-
-	/* ===== Derived Values ===== */
-	const theme = darkMode ? darkTheme : lightTheme;
 	const dynamicStyles = createDynamicStyles(theme);
 
 	/* ===== Callbacks ===== */
