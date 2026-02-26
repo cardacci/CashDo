@@ -103,7 +103,7 @@ For **physical devices**, update `API.BASE_URL` in [src/constants/index.ts](src/
 - **Built-in persistence:** The `persist` middleware integrates directly with AsyncStorage, handling serialization, hydration, and error recovery out of the box.
 - **Selective re-rendering:** Components subscribe only to the specific slices of state they need, avoiding unnecessary re-renders without extra memoization.
 - **TypeScript-first:** Full type inference with no extra configuration.
-- **Scalable simplicity:** The project uses two focused stores (`useTaskStore` for tasks and `useUndoStore` for undo functionality), keeping each store small and testable.
+- **Scalable simplicity:** The project uses three focused stores (`useTaskStore` for tasks, `useUndoStore` for undo functionality, and `useErrorStore` for centralized error handling), keeping each store small and testable.
 
 ## Error Handling
 
