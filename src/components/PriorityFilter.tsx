@@ -24,13 +24,16 @@ export function PriorityFilter() {
 
 	/* ===== Render ===== */
 	return (
-		<View style={styles.container}>
+		<View accessibilityRole="radiogroup" style={styles.container}>
 			{PRIORITY_OPTIONS.map((option) => {
 				const { color, key, label } = option;
 				const isActive = priorityFilter === key;
 
 				return (
 					<Pressable
+						accessibilityLabel={key === PRIORITY_FILTER_ALL ? 'All priorities' : `${label} priority`}
+						accessibilityRole="radio"
+						accessibilityState={{ selected: isActive }}
 						key={key}
 						onPress={() => setPriorityFilter(key)}
 						style={[styles.filterButton, { backgroundColor: isActive ? color : theme.filterInactive }]}
@@ -55,6 +58,8 @@ const styles = StyleSheet.create({
 	filterButton: {
 		borderRadius: 6,
 		flex: 1,
+		justifyContent: 'center',
+		minHeight: 44,
 		paddingVertical: 6
 	},
 	filterText: {

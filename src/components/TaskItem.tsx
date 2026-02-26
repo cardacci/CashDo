@@ -9,6 +9,15 @@ import { Priority, type Task } from '../types';
 import { formatDateTime } from '../utils/formatDateTime';
 
 /* ===== Constants ===== */
+const A11Y = {
+	CANCEL_LABEL: 'Cancel editing',
+	DELETE_LABEL: 'Delete task',
+	EDIT_INPUT_LABEL: 'Edit task text',
+	EDIT_LABEL: 'Edit task',
+	SAVE_LABEL: 'Save changes',
+	TOGGLE_HINT: 'Double tap to toggle completion'
+} as const;
+
 const ANIMATION_DURATION_EDIT = 150;
 const ANIMATION_DURATION_ENTRY = 300;
 const ANIMATION_DURATION_EXIT = 200;
@@ -112,6 +121,11 @@ function TaskItemComponent({ onEditStart, task }: TaskItemProps) {
 	return (
 		<Animated.View style={[dynamicStyles.container, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
 			<Pressable
+				accessibilityHint={A11Y.TOGGLE_HINT}
+				accessibilityLabel={task.text}
+				accessibilityRole="checkbox"
+				accessibilityState={{ checked: task.completed }}
+				hitSlop={11}
 				onPress={() => toggleTask(task.id)}
 				style={[
 					styles.checkbox,
@@ -121,7 +135,11 @@ function TaskItemComponent({ onEditStart, task }: TaskItemProps) {
 					}
 				]}
 			>
-				{task.completed && <Text style={styles.checkmark}>✓</Text>}
+				{task.completed && (
+					<Text importantForAccessibility="no" style={styles.checkmark}>
+						✓
+					</Text>
+				)}
 			</Pressable>
 
 			<View style={styles.content}>
@@ -129,6 +147,7 @@ function TaskItemComponent({ onEditStart, task }: TaskItemProps) {
 					<>
 						<View style={styles.editRow}>
 							<TextInput
+								accessibilityLabel={A11Y.EDIT_INPUT_LABEL}
 								autoComplete="off"
 								autoCorrect={false}
 								autoFocus
@@ -142,18 +161,34 @@ function TaskItemComponent({ onEditStart, task }: TaskItemProps) {
 							/>
 
 							<View style={styles.editActions}>
-								<Pressable onPress={handleSaveEdit} style={[styles.editAction, { backgroundColor: theme.success }]}>
-									<Text style={styles.editActionText}>✓</Text>
+								<Pressable
+									accessibilityLabel={A11Y.SAVE_LABEL}
+									accessibilityRole="button"
+									hitSlop={8}
+									onPress={handleSaveEdit}
+									style={[styles.editAction, { backgroundColor: theme.success }]}
+								>
+									<Text importantForAccessibility="no" style={styles.editActionText}>
+										✓
+									</Text>
 								</Pressable>
 
-								<Pressable onPress={handleCancelEdit} style={[styles.editAction, { backgroundColor: theme.textSecondary }]}>
-									<Text style={styles.editActionText}>✕</Text>
+								<Pressable
+									accessibilityLabel={A11Y.CANCEL_LABEL}
+									accessibilityRole="button"
+									hitSlop={8}
+									onPress={handleCancelEdit}
+									style={[styles.editAction, { backgroundColor: theme.textSecondary }]}
+								>
+									<Text importantForAccessibility="no" style={styles.editActionText}>
+										✕
+									</Text>
 								</Pressable>
 							</View>
 						</View>
 
 						{showEditCharCount && (
-							<Text style={[styles.editCharCount, { color: editCharCountColor, fontFamily: fonts.body }]}>
+							<Text accessibilityLiveRegion="polite" style={[styles.editCharCount, { color: editCharCountColor, fontFamily: fonts.body }]}>
 								{editText.length}/{TASK_TEXT_MAX_LENGTH}
 							</Text>
 						)}
@@ -171,16 +206,26 @@ function TaskItemComponent({ onEditStart, task }: TaskItemProps) {
 
 			{!isEditing && (
 				<>
-					<View style={[styles.priorityBadge, { backgroundColor: getPriorityColor() }]}>
+					<View importantForAccessibility="no" style={[styles.priorityBadge, { backgroundColor: getPriorityColor() }]}>
 						<Text style={[styles.priorityText, { fontFamily: fonts.bodySemiBold }]}>{PRIORITY_LABELS[task.priority]}</Text>
 					</View>
 
-					<Pressable onPress={handleEdit} style={styles.actionButton}>
-						<Text style={[styles.actionButtonText, { color: theme.textSecondary }]}>✎</Text>
+					<Pressable accessibilityLabel={A11Y.EDIT_LABEL} accessibilityRole="button" hitSlop={10} onPress={handleEdit} style={styles.actionButton}>
+						<Text importantForAccessibility="no" style={[styles.actionButtonText, { color: theme.textSecondary }]}>
+							✎
+						</Text>
 					</Pressable>
 
-					<Pressable onPress={handleDelete} style={styles.actionButton}>
-						<Text style={[styles.actionButtonText, { color: theme.danger }]}>✕</Text>
+					<Pressable
+						accessibilityLabel={A11Y.DELETE_LABEL}
+						accessibilityRole="button"
+						hitSlop={10}
+						onPress={handleDelete}
+						style={styles.actionButton}
+					>
+						<Text importantForAccessibility="no" style={[styles.actionButtonText, { color: theme.danger }]}>
+							✕
+						</Text>
 					</Pressable>
 				</>
 			)}

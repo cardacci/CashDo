@@ -117,6 +117,10 @@ All errors are handled gracefully through a dedicated modal. The user is always 
 - **Write errors** (AsyncStorage write failed): the modal shows a **Dismiss** button. The next state change will automatically retry the write.
 - **API sync errors** (server unreachable or request failed): a friendly "Working offline" modal with a branded **Got it** button reassures the user that their data is saved locally and will sync automatically.
 
+## Accessibility
+
+WCAG 2.1 AA compliant: semantic roles, labels, live regions, focus trapping, 44px touch targets, and AA contrast ratios across both themes. Compatible with TalkBack, VoiceOver, and web ARIA.
+
 ## Assumptions & Trade-offs
 
 - **Mock API:** json-server is used as the backend. It is a development tool and not suitable for production. All data lives in `db.json` on the local machine.

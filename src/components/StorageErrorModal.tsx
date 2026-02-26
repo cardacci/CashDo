@@ -114,10 +114,14 @@ export function StorageErrorModal() {
 	return (
 		<Modal animationType="fade" transparent visible>
 			<View style={styles.overlay}>
-				<View style={dynamicStyles.modal}>
-					<Text style={styles.icon}>{errorConfig?.icon}</Text>
+				<View accessibilityViewIsModal style={dynamicStyles.modal}>
+					<Text importantForAccessibility="no" style={styles.icon}>
+						{errorConfig?.icon}
+					</Text>
 
-					<Text style={[dynamicStyles.title, { fontFamily: fonts.headingSemiBold }]}>{errorConfig?.title}</Text>
+					<Text accessibilityRole="header" style={[dynamicStyles.title, { fontFamily: fonts.headingSemiBold }]}>
+						{errorConfig?.title}
+					</Text>
 
 					<Text style={[dynamicStyles.message, { fontFamily: fonts.body }]}>{errorConfig?.message}</Text>
 
@@ -125,7 +129,13 @@ export function StorageErrorModal() {
 
 					<View style={styles.buttonRow}>
 						{errorConfig?.buttons.map((btn) => (
-							<Pressable key={btn.label} onPress={actionHandlers[btn.action]} style={[styles.button, buttonVariantStyle[btn.variant]]}>
+							<Pressable
+								accessibilityLabel={btn.label}
+								accessibilityRole="button"
+								key={btn.label}
+								onPress={actionHandlers[btn.action]}
+								style={[styles.button, buttonVariantStyle[btn.variant]]}
+							>
 								<Text
 									style={[
 										styles.buttonText,
@@ -152,6 +162,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		borderRadius: BUTTON_BORDER_RADIUS,
 		flex: 1,
+		justifyContent: 'center',
+		minHeight: 44,
 		paddingHorizontal: BUTTON_PADDING_HORIZONTAL,
 		paddingVertical: BUTTON_PADDING_VERTICAL
 	},

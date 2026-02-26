@@ -5,6 +5,12 @@ import { fonts } from '../theme';
 import { FilterStatus } from '../types';
 
 /* ===== Constants ===== */
+const A11Y_LABELS: Record<FilterStatus, string> = {
+	[FilterStatus.All]: 'All tasks',
+	[FilterStatus.Completed]: 'Completed tasks',
+	[FilterStatus.Pending]: 'Pending tasks'
+} as const;
+
 const FILTERS: { key: FilterStatus; label: string }[] = [
 	{ key: FilterStatus.All, label: 'All' },
 	{ key: FilterStatus.Completed, label: 'Completed' },
@@ -22,12 +28,15 @@ export function FilterBar() {
 
 	/* ===== Render ===== */
 	return (
-		<View style={styles.container}>
+		<View accessibilityRole="radiogroup" style={styles.container}>
 			{FILTERS.map((filter) => {
 				const isActive = filterStatus === filter.key;
 
 				return (
 					<Pressable
+						accessibilityLabel={A11Y_LABELS[filter.key]}
+						accessibilityRole="radio"
+						accessibilityState={{ selected: isActive }}
 						key={filter.key}
 						onPress={() => setFilterStatus(filter.key)}
 						style={[styles.filterButton, { backgroundColor: isActive ? theme.filterActive : theme.filterInactive }]}
@@ -54,6 +63,8 @@ const styles = StyleSheet.create({
 	filterButton: {
 		borderRadius: 6,
 		flex: 1,
+		justifyContent: 'center',
+		minHeight: 44,
 		paddingVertical: 6
 	},
 	filterText: {
