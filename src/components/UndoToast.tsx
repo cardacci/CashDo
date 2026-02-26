@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { CAN_USE_NATIVE_DRIVER, TOAST } from '../constants';
 import { useTheme } from '../hooks/useTheme';
@@ -24,7 +24,7 @@ const TOAST_SHADOW_RADIUS = 8;
 const TOAST_ELEVATION = 6;
 
 /* ===== Component ===== */
-export function UndoToast() {
+function UndoToastComponent() {
 	/* ===== Store ===== */
 	const restoreTask = useTaskStore((state) => state.restoreTask);
 	const clearPendingDelete = useUndoStore((state) => state.clearPendingDelete);
@@ -105,6 +105,8 @@ export function UndoToast() {
 		</Animated.View>
 	);
 }
+
+export const UndoToast = memo(UndoToastComponent);
 
 /* ===== Styles ===== */
 function createDynamicStyles(theme: ThemeColors) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Animated, Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { CAN_USE_NATIVE_DRIVER, CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
 import { useTheme } from '../hooks/useTheme';
@@ -233,7 +233,7 @@ function TaskItemComponent({ onEditStart, task }: TaskItemProps) {
 	);
 }
 
-export const TaskItem = React.memo(TaskItemComponent);
+export const TaskItem = memo(TaskItemComponent);
 
 /* ===== Styles ===== */
 function createDynamicStyles(theme: ThemeColors) {

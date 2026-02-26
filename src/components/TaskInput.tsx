@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
 import { useTheme } from '../hooks/useTheme';
@@ -25,7 +25,7 @@ const PRIORITY_LABELS: Record<Priority, string> = {
 };
 
 /* ===== Component ===== */
-export function TaskInput() {
+function TaskInputComponent() {
 	/* ===== Store ===== */
 	const addTask = useTaskStore((state) => state.addTask);
 
@@ -146,6 +146,8 @@ export function TaskInput() {
 		</View>
 	);
 }
+
+export const TaskInput = memo(TaskInputComponent);
 
 /* ===== Styles ===== */
 function createDynamicStyles(theme: ThemeColors) {

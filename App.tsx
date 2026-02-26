@@ -2,9 +2,10 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } f
 import { useFonts, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { useCallback, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, KeyboardAvoidingView, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { FilterBar } from './src/components/FilterBar';
+import { ListEmpty } from './src/components/ListEmpty';
 import { PriorityFilter } from './src/components/PriorityFilter';
 import { StorageErrorModal } from './src/components/StorageErrorModal';
 import { TaskCounter } from './src/components/TaskCounter';
@@ -15,15 +16,13 @@ import { useFilteredTasks } from './src/hooks/useFilteredTasks';
 import { useTaskSync } from './src/hooks/useTaskSync';
 import { useTheme } from './src/hooks/useTheme';
 import { useTaskStore } from './src/store/useTaskStore';
-import { KEYBOARD_SCROLL_DELAY, LAYOUT, PRIORITY_FILTER_ALL } from './src/constants';
+import { IS_IOS, KEYBOARD_SCROLL_DELAY, LAYOUT, PRIORITY_FILTER_ALL } from './src/constants';
 import { fonts } from './src/theme';
 import { FilterStatus, StatusBarTheme, type Task } from './src/types';
 
 /* ===== Constants ===== */
 const A11Y = {
-	EMPTY_LABEL: 'No tasks to display',
 	LOADING_LABEL: 'Loading application',
-	RESET_FILTERS_LABEL: 'Reset all filters',
 	SYNC_LABEL: 'Syncing tasks with server',
 	TASK_LIST_LABEL: 'Task list',
 	THEME_LABEL: 'Toggle dark mode',
@@ -62,15 +61,22 @@ export default function App() {
 	const hasFiltersActive = filterStatus !== FilterStatus.All || priorityFilter !== PRIORITY_FILTER_ALL;
 	const isFilteredEmpty = tasks.length > 0 && filteredTasks.length === 0 && hasFiltersActive;
 
+	/* ===== Callbacks ===== */
+	const resetFilters = useCallback(
+		function resetFilters() {
+			setFilterStatus(FilterStatus.All);
+			setPriorityFilter(PRIORITY_FILTER_ALL);
+		},
+		[setFilterStatus, setPriorityFilter]
+	);
+
 	/* ===== Functions ===== */
-	function resetFilters() {
-		setFilterStatus(FilterStatus.All);
-		setPriorityFilter(PRIORITY_FILTER_ALL);
+	function keyExtractor(item: Task) {
+		return item.id;
 	}
 
-	/* ===== Callbacks ===== */
-	const renderItem = useCallback(
-		({ item, index }: { item: Task; index: number }) => (
+	function renderItem({ item, index }: { item: Task; index: number }) {
+		return (
 			<TaskItem
 				onEditStart={() => {
 					setTimeout(() => {
@@ -79,11 +85,8 @@ export default function App() {
 				}}
 				task={item}
 			/>
-		),
-		[]
-	);
-
-	const keyExtractor = useCallback((item: Task) => item.id, []);
+		);
+	}
 
 	/* ===== Loading ===== */
 	if (!isHydrated || !fontsLoaded) {
@@ -104,7 +107,7 @@ export default function App() {
 
 				<SafeAreaView edges={['bottom', 'left', 'right']} style={[styles.safeArea, { backgroundColor: theme.background }]}>
 					<View style={styles.appWrapper}>
-						<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+						<KeyboardAvoidingView behavior={IS_IOS ? 'padding' : 'height'} style={styles.container}>
 							{/* Header */}
 							<View style={[styles.header, { backgroundColor: theme.accent }]}>
 								<View style={styles.headerTitleRow}>
@@ -150,30 +153,7 @@ export default function App() {
 
 								{/* Task List */}
 								<FlatList
-									ListEmptyComponent={
-										<View accessibilityLabel={A11Y.EMPTY_LABEL} style={styles.emptyContainer}>
-											<Text style={[styles.emptyText, { color: theme.textSecondary, fontFamily: fonts.headingSemiBold }]}>
-												{isFilteredEmpty ? 'No tasks match the selected filters' : 'No tasks found'}
-											</Text>
-
-											<Text style={[styles.emptySubtext, { color: theme.textSecondary, fontFamily: fonts.body }]}>
-												{isFilteredEmpty ? 'Try changing your filters or reset them' : 'Add a task above to get started'}
-											</Text>
-
-											{isFilteredEmpty && (
-												<Pressable
-													accessibilityLabel={A11Y.RESET_FILTERS_LABEL}
-													accessibilityRole="button"
-													onPress={resetFilters}
-													style={[styles.resetButton, { backgroundColor: theme.accent }]}
-												>
-													<Text style={[styles.resetButtonText, { color: theme.accentText, fontFamily: fonts.bodyMedium }]}>
-														Reset Filters
-													</Text>
-												</Pressable>
-											)}
-										</View>
-									}
+									ListEmptyComponent={<ListEmpty isFilteredEmpty={isFilteredEmpty} onResetFilters={resetFilters} theme={theme} />}
 									accessibilityLabel={A11Y.TASK_LIST_LABEL}
 									contentContainerStyle={styles.listContent}
 									data={filteredTasks}
@@ -216,17 +196,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingTop: 16
 	},
-	emptyContainer: {
-		alignItems: 'center',
-		paddingTop: 48
-	},
-	emptySubtext: {
-		fontSize: 14
-	},
-	emptyText: {
-		fontSize: 17,
-		marginBottom: 6
-	},
 	header: {
 		alignItems: 'center',
 		flexDirection: 'row',
@@ -253,17 +222,6 @@ const styles = StyleSheet.create({
 	loadingText: {
 		fontSize: 15,
 		marginTop: 12
-	},
-	resetButton: {
-		borderRadius: 8,
-		justifyContent: 'center',
-		marginTop: 16,
-		minHeight: 44,
-		paddingHorizontal: 20,
-		paddingVertical: 10
-	},
-	resetButtonText: {
-		fontSize: 14
 	},
 	safeArea: {
 		flex: 1

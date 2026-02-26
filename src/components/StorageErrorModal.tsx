@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { API_ERROR, STORAGE_ERROR } from '../constants';
 import { useTheme } from '../hooks/useTheme';
@@ -67,7 +68,7 @@ const ERROR_CONFIG: Record<StorageErrorType, ErrorConfig> = {
 };
 
 /* ===== Component ===== */
-export function StorageErrorModal() {
+function StorageErrorModalComponent() {
 	/* ===== Store ===== */
 	const clearStorageError = useErrorStore((state) => state.clearStorageError);
 	const storageError = useErrorStore((state) => state.storageError);
@@ -155,6 +156,8 @@ export function StorageErrorModal() {
 		</Modal>
 	);
 }
+
+export const StorageErrorModal = memo(StorageErrorModalComponent);
 
 /* ===== Styles ===== */
 const styles = StyleSheet.create({
