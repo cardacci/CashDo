@@ -11,6 +11,8 @@ export const API = {
 	TIMEOUT: 5000
 } as const;
 
+export const API_ERROR_COOLDOWN = 60000;
+
 export const API_ERROR = {
 	BUTTON: 'Got it',
 	MESSAGE: 'Your data is saved on this device. Changes will sync automatically when the connection is back.',

@@ -15,6 +15,7 @@ A TODO list app built with React Native, Expo, and TypeScript. Inspired by the l
 - REST API integration with optimistic updates and offline merge strategy
 - Smooth animations for task entry, exit, and completion
 - Light and dark theme support
+- WCAG AA contrast compliance across both themes
 - Auto-scroll to the task being edited when the keyboard opens
 - Pull-to-refresh to sync with the API
 - Mobile-first design
@@ -79,8 +80,8 @@ The app integrates a REST API layer (json-server) alongside AsyncStorage, follow
 
 ```
 User Action → Zustand Store (instant local update)
-                  ├── AsyncStorage  (automatic via persist middleware)
-                  └── API call      (async, fire-and-forget)
+				  ├── AsyncStorage  (automatic via persist middleware)
+				  └── API call      (async, fire-and-forget)
 ```
 
 - **App start:** AsyncStorage is hydrated first for a fast initial render, then the API is fetched. Tasks created or edited while offline are pushed to the API, and the final state is merged using `updatedAt` timestamps.
@@ -115,6 +116,58 @@ All errors are handled gracefully through a dedicated modal. The user is always 
 - **Rehydration errors** (AsyncStorage read failed): the modal offers a **Retry** button to attempt rehydration again, and a **Continue** button to start with a fresh state.
 - **Write errors** (AsyncStorage write failed): the modal shows a **Dismiss** button. The next state change will automatically retry the write.
 - **API sync errors** (server unreachable or request failed): a friendly "Working offline" modal with a branded **Got it** button reassures the user that their data is saved locally and will sync automatically.
+
+## Accessibility
+
+WCAG 2.1 AA compliant: semantic roles, labels, live regions, focus trapping, 44px touch targets, and AA contrast ratios across both themes. Compatible with TalkBack, VoiceOver, and web ARIA.
+
+## Performance (Lighthouse)
+
+Audited against the production build on [GitHub Pages](https://cardacci.github.io/CashDo) (February 2026).
+
+<table>
+	<thead>
+		<tr>
+			<th align="left">Metric</th>
+			<th align="center">Mobile</th>
+			<th align="center">Desktop</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><strong>Performance</strong></td>
+			<td align="center">71</td>
+			<td align="center">92</td>
+		</tr>
+		<tr>
+			<td style="vertical-align: middle;">FCP <sup><sub>First Contentful Paint</sub></sup></td>
+			<td align="center" style="vertical-align: middle;">0.9 s</td>
+			<td align="center" style="vertical-align: middle;">0.4 s</td>
+		</tr>
+		<tr>
+			<td style="vertical-align: middle;">LCP <sup><sub>Largest Contentful Paint</sub></sup></td>
+			<td align="center" style="vertical-align: middle;">6.1 s</td>
+			<td align="center" style="vertical-align: middle;">1.2 s</td>
+		</tr>
+		<tr>
+			<td style="vertical-align: middle;">TBT <sup><sub>Total Blocking Time</sub></sup></td>
+			<td align="center" style="vertical-align: middle;">120 ms</td>
+			<td align="center" style="vertical-align: middle;">0 ms</td>
+		</tr>
+		<tr>
+			<td style="vertical-align: middle;">CLS <sup><sub>Cumulative Layout Shift</sub></sup></td>
+			<td align="center" style="vertical-align: middle;">0.01</td>
+			<td align="center" style="vertical-align: middle;">0.006</td>
+		</tr>
+		<tr>
+			<td>Speed Index</td>
+			<td align="center">6.6 s</td>
+			<td align="center">2.4 s</td>
+		</tr>
+	</tbody>
+</table>
+
+**Note:** The mobile LCP (6.1 s) is impacted by the single JS bundle that Expo generates for the web build. Code splitting and lazy loading are potential optimizations for a future iteration.
 
 ## Assumptions & Trade-offs
 

@@ -7,6 +7,12 @@ import { fonts, type ThemeColors } from '../theme';
 import { Priority } from '../types';
 
 /* ===== Constants ===== */
+const A11Y = {
+	ADD_HINT: 'Adds the task with the selected priority',
+	ADD_LABEL: 'Add task',
+	CLEAR_LABEL: 'Clear input',
+	INPUT_LABEL: 'New task description'
+} as const;
 
 const CLEAR_BUTTON_MIN_LENGTH = 10;
 
@@ -71,6 +77,7 @@ export function TaskInput() {
 		<View style={dynamicStyles.container}>
 			<View style={styles.inputWrapper}>
 				<TextInput
+					accessibilityLabel={A11Y.INPUT_LABEL}
 					autoComplete="off"
 					autoCorrect={false}
 					maxLength={TASK_TEXT_MAX_LENGTH}
@@ -85,19 +92,33 @@ export function TaskInput() {
 				/>
 
 				{showClearButton && (
-					<Pressable onPress={handleClearText} style={[styles.clearButton, { backgroundColor: theme.textSecondary }]}>
-						<Text style={[styles.clearButtonText, { color: theme.surface }]}>✕</Text>
+					<Pressable
+						accessibilityLabel={A11Y.CLEAR_LABEL}
+						accessibilityRole="button"
+						hitSlop={12}
+						onPress={handleClearText}
+						style={[styles.clearButton, { backgroundColor: theme.textSecondary }]}
+					>
+						<Text importantForAccessibility="no" style={[styles.clearButtonText, { color: theme.surface }]}>
+							✕
+						</Text>
 					</Pressable>
 				)}
 			</View>
 
-			<Text style={[styles.charCount, { color: charCountColor, fontFamily: fonts.body, opacity: showCharCount ? 1 : 0 }]}>
+			<Text
+				accessibilityLiveRegion="polite"
+				style={[styles.charCount, { color: charCountColor, fontFamily: fonts.body, opacity: showCharCount ? 1 : 0 }]}
+			>
 				{text.length}/{TASK_TEXT_MAX_LENGTH}
 			</Text>
 
-			<View style={styles.priorityRow}>
+			<View accessibilityRole="radiogroup" style={styles.priorityRow}>
 				{PRIORITIES.map((p) => (
 					<Pressable
+						accessibilityLabel={`${PRIORITY_LABELS[p]} priority`}
+						accessibilityRole="radio"
+						accessibilityState={{ selected: priority === p }}
 						key={p}
 						onPress={() => setPriority(p)}
 						style={[styles.priorityButton, { backgroundColor: priority === p ? getPriorityColor(p) : theme.filterInactive }]}
@@ -111,7 +132,15 @@ export function TaskInput() {
 				))}
 			</View>
 
-			<Pressable disabled={!text.trim()} onPress={handleAddTask} style={[dynamicStyles.addButton, !text.trim() && styles.addButtonDisabled]}>
+			<Pressable
+				accessibilityHint={A11Y.ADD_HINT}
+				accessibilityLabel={A11Y.ADD_LABEL}
+				accessibilityRole="button"
+				accessibilityState={{ disabled: !text.trim() }}
+				disabled={!text.trim()}
+				onPress={handleAddTask}
+				style={[dynamicStyles.addButton, !text.trim() && styles.addButtonDisabled]}
+			>
 				<Text style={[styles.addButtonText, { color: theme.primaryText, fontFamily: fonts.bodySemiBold }]}>Add Task</Text>
 			</Pressable>
 		</View>
@@ -125,6 +154,8 @@ function createDynamicStyles(theme: ThemeColors) {
 			alignItems: 'center',
 			backgroundColor: theme.primary,
 			borderRadius: 10,
+			justifyContent: 'center',
+			minHeight: 44,
 			paddingVertical: 14
 		},
 		container: {
@@ -186,6 +217,8 @@ const styles = StyleSheet.create({
 	priorityButton: {
 		borderRadius: 8,
 		flex: 1,
+		justifyContent: 'center',
+		minHeight: 44,
 		paddingVertical: 8
 	},
 	priorityButtonText: {

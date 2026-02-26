@@ -5,6 +5,11 @@ import { useTheme } from '../hooks/useTheme';
 import { fonts, type ThemeColors } from '../theme';
 import { CAN_USE_NATIVE_DRIVER, CELEBRATION, PROGRESS } from '../constants';
 
+/* ===== Constants ===== */
+const A11Y = {
+	PROGRESS_LABEL: 'Task completion'
+} as const;
+
 /* ===== Component ===== */
 export function TaskCounter() {
 	/* ===== Store ===== */
@@ -37,6 +42,7 @@ export function TaskCounter() {
 
 	useEffect(() => {
 		const justCompleted = isAllCompleted && !prevCompletedRef.current;
+
 		prevCompletedRef.current = isAllCompleted;
 
 		if (justCompleted) {
@@ -77,7 +83,11 @@ export function TaskCounter() {
 	const percentText = `${Math.round(progress * 100)}%`;
 
 	return (
-		<Animated.View style={[dynamicStyles.container, { transform: [{ scale: celebrationScaleAnim }] }]}>
+		<Animated.View
+			accessibilityLiveRegion="polite"
+			accessibilityRole="summary"
+			style={[dynamicStyles.container, { transform: [{ scale: celebrationScaleAnim }] }]}
+		>
 			<View style={styles.topRow}>
 				{isAllCompleted ? (
 					<Animated.Text style={[dynamicStyles.statusText, { opacity: celebrationOpacityAnim }]}>{'🎉 All tasks completed!'}</Animated.Text>
@@ -87,11 +97,20 @@ export function TaskCounter() {
 					</Text>
 				)}
 			</View>
-			<View style={styles.progressRow}>
+
+			<View
+				accessibilityLabel={A11Y.PROGRESS_LABEL}
+				accessibilityRole="progressbar"
+				accessibilityValue={{ max: 100, min: 0, now: Math.round(progress * 100) }}
+				style={styles.progressRow}
+			>
 				<View style={dynamicStyles.progressTrack}>
 					<Animated.View style={[dynamicStyles.progressFill, { width: progressBarWidth }]} />
 				</View>
-				<Text style={dynamicStyles.percentText}>{percentText}</Text>
+
+				<Text importantForAccessibility="no" style={dynamicStyles.percentText}>
+					{percentText}
+				</Text>
 			</View>
 		</Animated.View>
 	);

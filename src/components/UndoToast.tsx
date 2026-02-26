@@ -7,14 +7,18 @@ import { useUndoStore } from '../store/useUndoStore';
 import { fonts, type ThemeColors } from '../theme';
 
 /* ===== Constants ===== */
+const A11Y = {
+	UNDO_LABEL: 'Undo deletion'
+} as const;
+
 const TOAST_HORIZONTAL_MARGIN = 16;
 const TOAST_BORDER_RADIUS = 12;
 const TOAST_PADDING_HORIZONTAL = 16;
 const TOAST_PADDING_VERTICAL = 14;
 const TOAST_FONT_SIZE = 14;
 const TOAST_UNDO_LETTER_SPACING = 0.5;
-const TOAST_UNDO_PADDING_HORIZONTAL = 8;
-const TOAST_UNDO_PADDING_VERTICAL = 4;
+const TOAST_UNDO_PADDING_HORIZONTAL = 16;
+const TOAST_UNDO_PADDING_VERTICAL = 12;
 const TOAST_SHADOW_OFFSET_HEIGHT = 2;
 const TOAST_SHADOW_RADIUS = 8;
 const TOAST_ELEVATION = 6;
@@ -92,10 +96,10 @@ export function UndoToast() {
 	}
 
 	return (
-		<Animated.View style={[dynamicStyles.container, { transform: [{ translateY }] }]}>
+		<Animated.View accessibilityLiveRegion="assertive" accessibilityRole="alert" style={[dynamicStyles.container, { transform: [{ translateY }] }]}>
 			<Text style={[dynamicStyles.message, { fontFamily: fonts.bodySemiBold }]}>{TOAST.MESSAGE_DELETED}</Text>
 
-			<Pressable onPress={handleUndo} style={styles.undoButton}>
+			<Pressable accessibilityLabel={A11Y.UNDO_LABEL} accessibilityRole="button" onPress={handleUndo} style={styles.undoButton}>
 				<Text style={[dynamicStyles.undoText, { fontFamily: fonts.bodyBold }]}>{TOAST.UNDO_LABEL}</Text>
 			</Pressable>
 		</Animated.View>

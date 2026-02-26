@@ -19,6 +19,17 @@ import { KEYBOARD_SCROLL_DELAY, LAYOUT, PRIORITY_FILTER_ALL } from './src/consta
 import { fonts } from './src/theme';
 import { FilterStatus, StatusBarTheme, type Task } from './src/types';
 
+/* ===== Constants ===== */
+const A11Y = {
+	EMPTY_LABEL: 'No tasks to display',
+	LOADING_LABEL: 'Loading application',
+	RESET_FILTERS_LABEL: 'Reset all filters',
+	SYNC_LABEL: 'Syncing tasks with server',
+	TASK_LIST_LABEL: 'Task list',
+	THEME_LABEL: 'Toggle dark mode',
+	TITLE_LABEL: 'CashDo'
+} as const;
+
 /* ===== Component ===== */
 export default function App() {
 	/* ===== Store ===== */
@@ -77,7 +88,7 @@ export default function App() {
 	/* ===== Loading ===== */
 	if (!isHydrated || !fontsLoaded) {
 		return (
-			<View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+			<View accessibilityLabel={A11Y.LOADING_LABEL} style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
 				<ActivityIndicator color={theme.accent} size="large" />
 
 				<Text style={[styles.loadingText, { color: theme.textSecondary }]}>Loading...</Text>
@@ -97,13 +108,31 @@ export default function App() {
 							{/* Header */}
 							<View style={[styles.header, { backgroundColor: theme.accent }]}>
 								<View style={styles.headerTitleRow}>
-									<Text style={[styles.title, { color: theme.accentText, fontFamily: fonts.heading }]}>CashDo</Text>
+									<Text accessibilityRole="header" style={[styles.title, { color: theme.accentText, fontFamily: fonts.heading }]}>
+										{A11Y.TITLE_LABEL}
+									</Text>
 
-									{isSyncing && <ActivityIndicator color={theme.accentText} size="small" />}
+									{isSyncing && (
+										<ActivityIndicator
+											accessibilityLabel={A11Y.SYNC_LABEL}
+											accessibilityLiveRegion="polite"
+											color={theme.accentText}
+											size="small"
+										/>
+									)}
 								</View>
 
-								<Pressable onPress={toggleDarkMode} style={[styles.themeToggle, { backgroundColor: theme.accentText }]}>
-									<Text style={styles.themeToggleText}>{darkMode ? '☀️' : '🌙'}</Text>
+								<Pressable
+									accessibilityLabel={A11Y.THEME_LABEL}
+									accessibilityRole="switch"
+									accessibilityState={{ checked: darkMode }}
+									hitSlop={4}
+									onPress={toggleDarkMode}
+									style={[styles.themeToggle, { backgroundColor: theme.accentText }]}
+								>
+									<Text importantForAccessibility="no" style={styles.themeToggleText}>
+										{darkMode ? '☀️' : '🌙'}
+									</Text>
 								</Pressable>
 							</View>
 
@@ -122,7 +151,7 @@ export default function App() {
 								{/* Task List */}
 								<FlatList
 									ListEmptyComponent={
-										<View style={styles.emptyContainer}>
+										<View accessibilityLabel={A11Y.EMPTY_LABEL} style={styles.emptyContainer}>
 											<Text style={[styles.emptyText, { color: theme.textSecondary, fontFamily: fonts.headingSemiBold }]}>
 												{isFilteredEmpty ? 'No tasks match the selected filters' : 'No tasks found'}
 											</Text>
@@ -132,7 +161,12 @@ export default function App() {
 											</Text>
 
 											{isFilteredEmpty && (
-												<Pressable onPress={resetFilters} style={[styles.resetButton, { backgroundColor: theme.accent }]}>
+												<Pressable
+													accessibilityLabel={A11Y.RESET_FILTERS_LABEL}
+													accessibilityRole="button"
+													onPress={resetFilters}
+													style={[styles.resetButton, { backgroundColor: theme.accent }]}
+												>
 													<Text style={[styles.resetButtonText, { color: theme.accentText, fontFamily: fonts.bodyMedium }]}>
 														Reset Filters
 													</Text>
@@ -140,6 +174,7 @@ export default function App() {
 											)}
 										</View>
 									}
+									accessibilityLabel={A11Y.TASK_LIST_LABEL}
 									contentContainerStyle={styles.listContent}
 									data={filteredTasks}
 									keyExtractor={keyExtractor}
@@ -221,7 +256,9 @@ const styles = StyleSheet.create({
 	},
 	resetButton: {
 		borderRadius: 8,
+		justifyContent: 'center',
 		marginTop: 16,
+		minHeight: 44,
 		paddingHorizontal: 20,
 		paddingVertical: 10
 	},
