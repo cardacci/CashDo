@@ -14,6 +14,7 @@ export enum Priority {
 }
 
 export enum StorageErrorType {
+	Api = 'api',
 	Rehydration = 'rehydration',
 	Write = 'write'
 }
@@ -31,4 +32,5 @@ export interface Task {
 	id: string;
 	priority: Priority;
 	text: string;
+	updatedAt: number;
 }

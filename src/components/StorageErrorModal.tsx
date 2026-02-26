@@ -1,10 +1,27 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { STORAGE_ERROR } from '../constants';
+import { API_ERROR, STORAGE_ERROR } from '../constants';
 import { useTheme } from '../hooks/useTheme';
 import { useErrorStore } from '../store/useErrorStore';
 import { useTaskStore } from '../store/useTaskStore';
 import { fonts, type ThemeColors } from '../theme';
 import { StorageErrorType } from '../types';
+
+/* ===== Types ===== */
+type ButtonAction = 'dismiss' | 'retry';
+
+type ButtonVariant = 'primary' | 'secondary';
+
+interface ErrorButtonConfig {
+	action: ButtonAction;
+	label: string;
+	variant: ButtonVariant;
+}
+
+interface ErrorConfig {
+	buttons: ErrorButtonConfig[];
+	message: string;
+	title: string;
+}
 
 /* ===== Constants ===== */
 const OVERLAY_COLOR = 'rgba(0, 0, 0, 0.5)';
@@ -21,6 +38,27 @@ const MESSAGE_FONT_SIZE = 14;
 const BUTTON_FONT_SIZE = 15;
 const DETAIL_FONT_SIZE = 12;
 
+const ERROR_CONFIG: Record<StorageErrorType, ErrorConfig> = {
+	[StorageErrorType.Api]: {
+		buttons: [{ action: 'dismiss', label: STORAGE_ERROR.BUTTON_DISMISS, variant: 'primary' }],
+		message: API_ERROR.MESSAGE,
+		title: API_ERROR.TITLE
+	},
+	[StorageErrorType.Rehydration]: {
+		buttons: [
+			{ action: 'retry', label: STORAGE_ERROR.BUTTON_RETRY, variant: 'primary' },
+			{ action: 'dismiss', label: STORAGE_ERROR.BUTTON_CONTINUE, variant: 'secondary' }
+		],
+		message: STORAGE_ERROR.MESSAGE_READ,
+		title: STORAGE_ERROR.TITLE_READ
+	},
+	[StorageErrorType.Write]: {
+		buttons: [{ action: 'dismiss', label: STORAGE_ERROR.BUTTON_DISMISS, variant: 'primary' }],
+		message: STORAGE_ERROR.MESSAGE_WRITE,
+		title: STORAGE_ERROR.TITLE_WRITE
+	}
+};
+
 /* ===== Component ===== */
 export function StorageErrorModal() {
 	/* ===== Store ===== */
@@ -32,7 +70,7 @@ export function StorageErrorModal() {
 
 	/* ===== Derived Values ===== */
 	const dynamicStyles = createDynamicStyles(theme);
-	const isRehydrationError = storageError?.type === StorageErrorType.Rehydration;
+	const errorConfig = storageError ? ERROR_CONFIG[storageError.type] : null;
 
 	/* ===== Functions ===== */
 	function handleDismiss() {
@@ -43,6 +81,11 @@ export function StorageErrorModal() {
 		clearStorageError();
 		useTaskStore.persist.rehydrate();
 	}
+
+	const actionHandlers: Record<ButtonAction, () => void> = {
+		dismiss: handleDismiss,
+		retry: handleRetry
+	};
 
 	/* ===== Render ===== */
 	if (!storageError) {
@@ -55,38 +98,32 @@ export function StorageErrorModal() {
 				<View style={dynamicStyles.modal}>
 					<Text style={styles.errorIcon}>{ERROR_ICON}</Text>
 
-					<Text style={[dynamicStyles.title, { fontFamily: fonts.headingSemiBold }]}>
-						{isRehydrationError ? STORAGE_ERROR.TITLE_READ : STORAGE_ERROR.TITLE_WRITE}
-					</Text>
+					<Text style={[dynamicStyles.title, { fontFamily: fonts.headingSemiBold }]}>{errorConfig?.title}</Text>
 
-					<Text style={[dynamicStyles.message, { fontFamily: fonts.body }]}>
-						{isRehydrationError ? STORAGE_ERROR.MESSAGE_READ : STORAGE_ERROR.MESSAGE_WRITE}
-					</Text>
+					<Text style={[dynamicStyles.message, { fontFamily: fonts.body }]}>{errorConfig?.message}</Text>
 
 					<Text style={[dynamicStyles.detail, { fontFamily: fonts.body }]}>{storageError.message}</Text>
 
 					<View style={styles.buttonRow}>
-						{isRehydrationError ? (
-							<>
-								<Pressable onPress={handleRetry} style={[styles.button, { backgroundColor: theme.danger }]}>
-									<Text style={[styles.buttonText, { color: theme.dangerText, fontFamily: fonts.bodySemiBold }]}>
-										{STORAGE_ERROR.BUTTON_RETRY}
-									</Text>
-								</Pressable>
-
-								<Pressable onPress={handleDismiss} style={[styles.button, dynamicStyles.secondaryButton]}>
-									<Text style={[styles.buttonText, { color: theme.text, fontFamily: fonts.bodySemiBold }]}>
-										{STORAGE_ERROR.BUTTON_CONTINUE}
-									</Text>
-								</Pressable>
-							</>
-						) : (
-							<Pressable onPress={handleDismiss} style={[styles.button, { backgroundColor: theme.danger }]}>
-								<Text style={[styles.buttonText, { color: theme.dangerText, fontFamily: fonts.bodySemiBold }]}>
-									{STORAGE_ERROR.BUTTON_DISMISS}
+						{errorConfig?.buttons.map((btn) => (
+							<Pressable
+								key={btn.label}
+								onPress={actionHandlers[btn.action]}
+								style={[styles.button, btn.variant === 'primary' ? { backgroundColor: theme.danger } : dynamicStyles.secondaryButton]}
+							>
+								<Text
+									style={[
+										styles.buttonText,
+										{
+											color: btn.variant === 'primary' ? theme.dangerText : theme.text,
+											fontFamily: fonts.bodySemiBold
+										}
+									]}
+								>
+									{btn.label}
 								</Text>
 							</Pressable>
-						)}
+						))}
 					</View>
 				</View>
 			</View>

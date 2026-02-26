@@ -11,9 +11,12 @@ A TODO list app built with React Native, Expo, and TypeScript. Inspired by the l
 - Clear input button after 10 characters
 - Undo recently deleted tasks
 - Task progress bar with completion tracking
-- Data persistence across sessions
+- Data persistence across sessions (AsyncStorage)
+- REST API integration with optimistic updates and offline merge strategy
 - Smooth animations for task entry, exit, and completion
 - Light and dark theme support
+- Auto-scroll to the task being edited when the keyboard opens
+- Pull-to-refresh to sync with the API
 - Mobile-first design
 
 ## Getting Started
@@ -36,12 +39,24 @@ npm install
 
 ### Running the App
 
+The app has two independent processes: the Expo dev server and the json-server mock API. Run both simultaneously in separate terminals for full API integration.
+
+**Terminal 1: Mock API:**
+
+```bash
+npm run api        # Start json-server on http://localhost:3001
+```
+
+**Terminal 2: Expo:**
+
 ```bash
 npm start          # Start Expo dev server
 npm run android    # Run on Android emulator/device
 npm run ios        # Run on iOS simulator/device
 npm run web        # Run in the browser
 ```
+
+> The app works without the API running, it falls back to locally cached data (AsyncStorage). A "Sync failed" modal will appear on startup and can be dismissed.
 
 Or try it live at [https://cardacci.github.io/CashDo](https://cardacci.github.io/CashDo)
 
@@ -53,9 +68,31 @@ Or try it live at [https://cardacci.github.io/CashDo](https://cardacci.github.io
 | react                                     | 19.1.0   | UI library            |
 | react-native                              | 0.81.5   | Mobile runtime        |
 | zustand                                   | ^5.0.11  | State management      |
-| @react-native-async-storage/async-storage | 2.2.0    | Data persistence      |
+| @react-native-async-storage/async-storage | 2.2.0    | Local cache           |
 | react-native-web                          | ^0.21.0  | Web support           |
 | typescript                                | ~5.9.2   | Type safety           |
+| json-server _(dev)_                       | ^1.0.0   | Mock REST API         |
+
+## API Integration
+
+The app integrates a REST API layer (json-server) alongside AsyncStorage, following an **optimistic update** strategy:
+
+```
+User Action → Zustand Store (instant local update)
+                  ├── AsyncStorage  (automatic via persist middleware)
+                  └── API call      (async, fire-and-forget)
+```
+
+- **App start:** AsyncStorage is hydrated first for a fast initial render, then the API is fetched. Tasks created or edited while offline are pushed to the API, and the final state is merged using `updatedAt` timestamps.
+- **Mutations** (create, edit, delete, toggle): the local store updates immediately for a responsive UI, and the API call fires in the background.
+- **Pull-to-refresh:** applies the same offline-merge strategy as app start.
+- **Offline mode:** if the API is unreachable, the app continues working from the AsyncStorage cache. A non-blocking error modal informs the user.
+
+### Android emulator note
+
+Android emulators route `localhost` to the emulator itself, not the host machine. The app automatically uses `http://10.0.2.2:3001` on Android and `http://localhost:3001` on iOS/web.
+
+For **physical devices**, update `API.BASE_URL` in [src/constants/index.ts](src/constants/index.ts) to your machine's local IP address (e.g. `http://192.168.1.x:3001`).
 
 ## State Management
 
@@ -69,18 +106,19 @@ Or try it live at [https://cardacci.github.io/CashDo](https://cardacci.github.io
 
 ## Error Handling
 
-AsyncStorage errors are handled gracefully through a dedicated error modal. When a read or write operation fails, the user is notified with a clear message and actionable options.
+All errors are handled gracefully through a dedicated modal. The user is always notified with a clear message and actionable options.
 
 | Scenario            | Modal                                                                                             |
 | ------------------- | ------------------------------------------------------------------------------------------------- |
 | Data failed to load | <img src="docs/assets/could-not-load-your-data.jpg" alt="Could not load your data" width="240" /> |
 
-- **Rehydration errors** (data failed to load): the modal offers a **Retry** button to attempt rehydration again, and a **Continue** button to start with a fresh state.
-- **Write errors** (changes failed to save): the modal shows a **Dismiss** button. The next state change will automatically retry the write.
+- **Rehydration errors** (AsyncStorage read failed): the modal offers a **Retry** button to attempt rehydration again, and a **Continue** button to start with a fresh state.
+- **Write errors** (AsyncStorage write failed): the modal shows a **Dismiss** button. The next state change will automatically retry the write.
+- **API sync errors** (server unreachable or request failed): the modal shows a **Dismiss** button. The app continues working from cached data.
 
 ## Assumptions & Trade-offs
 
-- **Local-only storage:** AsyncStorage was used as the persistence layer. There is no backend or API; all data lives on the device/browser (localStorage on web).
+- **Mock API:** json-server is used as the backend. It is a development tool and not suitable for production. All data lives in `db.json` on the local machine.
 - **Task text limit:** 1000 characters per task, with a visual warning at 80% capacity.
 - **Sort order:** Tasks are sorted by creation date (newest first). A configurable sort was not added to keep the UI focused.
 - **Filters are not persisted:** Status and priority filters reset when the app restarts. This was intentional to always show all tasks on launch.
@@ -90,7 +128,25 @@ AsyncStorage errors are handled gracefully through a dedicated error modal. When
 ## Known Limitations
 
 - No unit or integration tests (not required by the challenge, but planned for a future iteration)
-- Pull-to-refresh has no effect on data since there is no remote API; it provides visual feedback only
+- Physical device testing requires manually updating the API base URL to the host machine's local IP
+- Server-side deletions are not propagated locally: if a task is removed directly from `db.json` while the app is running, it will reappear on the next sync (the app treats it as an offline-created task). Handling this would require a soft-delete mechanism on the server
+- Local storage capacity: the AsyncStorage cache can fill up. Each task serialized to JSON at maximum length weighs approximately **1,146 bytes (~1.12 KB)**, broken down as follows:
+
+    | Field       | Max size         | Bytes                   |
+    | ----------- | ---------------- | ----------------------- |
+    | `completed` | boolean          | 5 B                     |
+    | `createdAt` | timestamp number | 13 B                    |
+    | `id`        | UUID (36 chars)  | 36 B                    |
+    | `priority`  | `"medium"` (6)   | 6 B                     |
+    | `text`      | 1,000 characters | 1,000 B                 |
+    | `updatedAt` | timestamp number | 13 B                    |
+    | JSON syntax | keys + brackets  | ~73 B                   |
+    | **Total**   |                  | **~1,146 B (~1.12 KB)** |
+
+    At that worst-case size per task, the estimated limits are:
+    - **Web** (`localStorage`): ~4,500 tasks: browsers enforce a **5 MB** per-origin cap
+    - **Android**: ~5,400 tasks: AsyncStorage uses SQLite with a default **6 MB** cap
+    - **iOS**: effectively unlimited: AsyncStorage uses the file system, capped only by available device storage
 
 ## Dev Features & DX
 

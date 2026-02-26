@@ -21,6 +21,7 @@
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-prettier": "^5.5.5",
 		"husky": "^9.1.7",
+		"json-server": "^1.0.0-beta.9",
 		"lint-staged": "^16.2.7",
 		"prettier": "^3.8.1",
 		"typescript": "~5.9.2"
@@ -35,6 +36,7 @@
 	},
 	"scripts": {
 		"android": "expo start --android",
+		"api": "json-server --watch db.json --port 3001",
 		"format:check": "prettier --check .",
 		"format": "prettier --write .",
 		"ios": "expo start --ios",

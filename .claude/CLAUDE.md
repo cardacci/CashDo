@@ -23,13 +23,13 @@ CashDo: a TODO list app built with React Native, Expo, and TypeScript. Uses Zust
 
 # Project Structure
 
-- `src/types/` — Shared TypeScript types and interfaces.
-- `src/store/` — Zustand stores with AsyncStorage persistence.
-- `src/utils/` — Utility functions (e.g., `generateId`).
-- `src/theme/` — Light/dark theme color definitions.
-- `src/hooks/` — Custom React hooks.
-- `src/components/` — Reusable UI components.
-- `App.tsx` — Root component that wires everything together.
+- `src/types/`: Shared TypeScript types and interfaces.
+- `src/store/`: Zustand stores with AsyncStorage persistence.
+- `src/utils/`: Utility functions (e.g., `generateId`).
+- `src/theme/`: Light/dark theme color definitions.
+- `src/hooks/`: Custom React hooks.
+- `src/components/`: Reusable UI components.
+- `App.tsx`: Root component that wires everything together.
 
 # Git & Branching
 

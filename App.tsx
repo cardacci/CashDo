@@ -1,6 +1,6 @@
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { useFonts, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -12,9 +12,10 @@ import { TaskInput } from './src/components/TaskInput';
 import { TaskItem } from './src/components/TaskItem';
 import { UndoToast } from './src/components/UndoToast';
 import { useFilteredTasks } from './src/hooks/useFilteredTasks';
+import { useTaskSync } from './src/hooks/useTaskSync';
 import { useTheme } from './src/hooks/useTheme';
 import { useTaskStore } from './src/store/useTaskStore';
-import { KEYBOARD_SCROLL_DELAY, LAYOUT, PRIORITY_FILTER_ALL, TASK_LIST_REFRESH_DELAY } from './src/constants';
+import { KEYBOARD_SCROLL_DELAY, LAYOUT, PRIORITY_FILTER_ALL } from './src/constants';
 import { fonts } from './src/theme';
 import { FilterStatus, StatusBarTheme, type Task } from './src/types';
 
@@ -40,10 +41,8 @@ export default function App() {
 		Poppins_600SemiBold,
 		Poppins_700Bold
 	});
+	const { isSyncing, syncFromApi } = useTaskSync();
 	const theme = useTheme();
-
-	/* ===== State ===== */
-	const [refreshing, setRefreshing] = useState(false);
 
 	/* ===== Refs ===== */
 	const flatListRef = useRef<FlatList<Task>>(null);
@@ -53,11 +52,6 @@ export default function App() {
 	const isFilteredEmpty = tasks.length > 0 && filteredTasks.length === 0 && hasFiltersActive;
 
 	/* ===== Functions ===== */
-	function onRefresh() {
-		setRefreshing(true);
-		setTimeout(() => setRefreshing(false), TASK_LIST_REFRESH_DELAY);
-	}
-
 	function resetFilters() {
 		setFilterStatus(FilterStatus.All);
 		setPriorityFilter(PRIORITY_FILTER_ALL);
@@ -102,7 +96,11 @@ export default function App() {
 						<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
 							{/* Header */}
 							<View style={[styles.header, { backgroundColor: theme.accent }]}>
-								<Text style={[styles.title, { color: theme.accentText, fontFamily: fonts.heading }]}>CashDo</Text>
+								<View style={styles.headerTitleRow}>
+									<Text style={[styles.title, { color: theme.accentText, fontFamily: fonts.heading }]}>CashDo</Text>
+
+									{isSyncing && <ActivityIndicator color={theme.accentText} size="small" />}
+								</View>
 
 								<Pressable onPress={toggleDarkMode} style={[styles.themeToggle, { backgroundColor: theme.accentText }]}>
 									<Text style={styles.themeToggleText}>{darkMode ? '☀️' : '🌙'}</Text>
@@ -148,7 +146,7 @@ export default function App() {
 									keyboardDismissMode="on-drag"
 									ref={flatListRef}
 									refreshControl={
-										<RefreshControl colors={[theme.accent]} onRefresh={onRefresh} refreshing={refreshing} tintColor={theme.accent} />
+										<RefreshControl colors={[theme.accent]} onRefresh={syncFromApi} refreshing={isSyncing} tintColor={theme.accent} />
 									}
 									renderItem={renderItem}
 									showsVerticalScrollIndicator={false}
@@ -200,6 +198,11 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		paddingHorizontal: 20,
 		paddingVertical: 14
+	},
+	headerTitleRow: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 8
 	},
 	list: {
 		flex: 1

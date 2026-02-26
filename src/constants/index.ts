@@ -1,5 +1,21 @@
 import { Platform } from 'react-native';
 
+export const API = {
+	BASE_URL: Platform.select({
+		android: 'http://10.0.2.2:3001',
+		default: 'http://localhost:3001'
+	}) as string,
+	ENDPOINTS: {
+		TASKS: '/tasks'
+	},
+	TIMEOUT: 5000
+} as const;
+
+export const API_ERROR = {
+	MESSAGE: 'Could not reach the server. Your data is saved locally.',
+	TITLE: 'Sync failed'
+} as const;
+
 export const CAN_USE_NATIVE_DRIVER = Platform.OS !== 'web';
 
 export const CELEBRATION = {
@@ -48,3 +64,5 @@ export const TOAST = {
 	TRANSLATE_Y_HIDDEN: 100,
 	UNDO_LABEL: 'UNDO'
 } as const;
+
+export const UNKNOWN_ERROR_MESSAGE = 'Unknown error';
