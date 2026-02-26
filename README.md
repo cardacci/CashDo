@@ -15,6 +15,7 @@ A TODO list app built with React Native, Expo, and TypeScript. Inspired by the l
 - REST API integration with optimistic updates and offline merge strategy
 - Smooth animations for task entry, exit, and completion
 - Light and dark theme support
+- WCAG AA contrast compliance across both themes
 - Auto-scroll to the task being edited when the keyboard opens
 - Pull-to-refresh to sync with the API
 - Mobile-first design
