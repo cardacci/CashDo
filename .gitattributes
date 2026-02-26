@@ -1,0 +1,2 @@
+# Force CRLF line endings on all platforms (including CI)
+* text=auto eol=crlf
