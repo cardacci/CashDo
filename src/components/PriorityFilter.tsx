@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { PRIORITY_FILTER_ALL } from '../constants';
 import { useTheme } from '../hooks/useTheme';
@@ -14,7 +15,7 @@ const PRIORITY_OPTIONS: { color: string; key: PriorityFilterType; label: string 
 ];
 
 /* ===== Component ===== */
-export function PriorityFilter() {
+function PriorityFilterComponent() {
 	/* ===== Store ===== */
 	const priorityFilter = useTaskStore((state) => state.priorityFilter);
 	const setPriorityFilter = useTaskStore((state) => state.setPriorityFilter);
@@ -47,6 +48,8 @@ export function PriorityFilter() {
 		</View>
 	);
 }
+
+export const PriorityFilter = memo(PriorityFilterComponent);
 
 /* ===== Styles ===== */
 const styles = StyleSheet.create({

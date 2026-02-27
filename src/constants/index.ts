@@ -32,6 +32,8 @@ export const CHAR_COUNT = {
 	WARNING_THRESHOLD: 0.8
 } as const;
 
+export const IS_IOS = Platform.OS === 'ios';
+
 export const KEYBOARD_SCROLL_DELAY = 300;
 
 export const LAYOUT = {

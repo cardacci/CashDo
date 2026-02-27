@@ -2,15 +2,15 @@ import { API } from '../constants';
 import type { Task } from '../types';
 
 /* ===== Constants & Enums ===== */
-enum ContentType {
+export enum ContentType {
 	JSON = 'application/json'
 }
 
-enum Headers {
+export enum Headers {
 	CONTENT_TYPE = 'Content-Type'
 }
 
-enum Method {
+export enum Method {
 	DELETE = 'DELETE',
 	PATCH = 'PATCH',
 	POST = 'POST'

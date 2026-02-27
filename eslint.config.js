@@ -11,5 +11,23 @@ module.exports = defineConfig([
 			'react/jsx-sort-props': ['warn', { ignoreCase: false }],
 			'sort-keys': ['warn', 'asc', { caseSensitive: true, natural: true }]
 		}
+	},
+	{
+		files: ['src/__tests__/**/*.ts'],
+		languageOptions: {
+			globals: {
+				afterAll: 'readonly',
+				afterEach: 'readonly',
+				beforeAll: 'readonly',
+				beforeEach: 'readonly',
+				describe: 'readonly',
+				expect: 'readonly',
+				it: 'readonly',
+				jest: 'readonly'
+			}
+		},
+		rules: {
+			'@typescript-eslint/no-require-imports': 'off'
+		}
 	}
 ]);

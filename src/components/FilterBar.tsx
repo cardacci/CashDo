@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../hooks/useTheme';
 import { useTaskStore } from '../store/useTaskStore';
@@ -18,7 +19,7 @@ const FILTERS: { key: FilterStatus; label: string }[] = [
 ];
 
 /* ===== Component ===== */
-export function FilterBar() {
+function FilterBarComponent() {
 	/* ===== Store ===== */
 	const filterStatus = useTaskStore((state) => state.filterStatus);
 	const setFilterStatus = useTaskStore((state) => state.setFilterStatus);
@@ -52,6 +53,8 @@ export function FilterBar() {
 		</View>
 	);
 }
+
+export const FilterBar = memo(FilterBarComponent);
 
 /* ===== Styles ===== */
 const styles = StyleSheet.create({

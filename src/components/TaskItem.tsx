@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Animated, Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { CAN_USE_NATIVE_DRIVER, CHAR_COUNT, TASK_TEXT_MAX_LENGTH } from '../constants';
 import { useTheme } from '../hooks/useTheme';
@@ -21,6 +21,7 @@ const A11Y = {
 const ANIMATION_DURATION_EDIT = 150;
 const ANIMATION_DURATION_ENTRY = 300;
 const ANIMATION_DURATION_EXIT = 200;
+const COMPLETED_CONTAINER_OPACITY = 0.7;
 const RECENTLY_CREATED_THRESHOLD = 1000;
 
 const PRIORITY_LABELS: Record<Priority, string> = {
@@ -119,7 +120,9 @@ function TaskItemComponent({ onEditStart, task }: TaskItemProps) {
 
 	/* ===== Render ===== */
 	return (
-		<Animated.View style={[dynamicStyles.container, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
+		<Animated.View
+			style={[dynamicStyles.container, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }, task.completed && styles.completedContainer]}
+		>
 			<Pressable
 				accessibilityHint={A11Y.TOGGLE_HINT}
 				accessibilityLabel={task.text}
@@ -233,7 +236,7 @@ function TaskItemComponent({ onEditStart, task }: TaskItemProps) {
 	);
 }
 
-export const TaskItem = React.memo(TaskItemComponent);
+export const TaskItem = memo(TaskItemComponent);
 
 /* ===== Styles ===== */
 function createDynamicStyles(theme: ThemeColors) {
@@ -303,8 +306,10 @@ const styles = StyleSheet.create({
 		fontSize: 13,
 		fontWeight: 'bold'
 	},
+	completedContainer: {
+		opacity: COMPLETED_CONTAINER_OPACITY
+	},
 	completedText: {
-		opacity: 0.45,
 		textDecorationLine: 'line-through'
 	},
 	content: {

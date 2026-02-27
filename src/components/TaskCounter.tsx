@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
 import { useTheme } from '../hooks/useTheme';
@@ -11,7 +11,7 @@ const A11Y = {
 } as const;
 
 /* ===== Component ===== */
-export function TaskCounter() {
+function TaskCounterComponent() {
 	/* ===== Store ===== */
 	const tasks = useTaskStore((state) => state.tasks);
 
@@ -115,6 +115,8 @@ export function TaskCounter() {
 		</Animated.View>
 	);
 }
+
+export const TaskCounter = memo(TaskCounterComponent);
 
 /* ===== Styles ===== */
 const styles = StyleSheet.create({
