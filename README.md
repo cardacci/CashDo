@@ -208,6 +208,7 @@ Audited against the production build on [GitHub Pages](https://cardacci.github.i
 ## Known Limitations
 
 - Physical device testing requires manually updating the API base URL to the host machine's local IP
+- Auto-scroll to the edited task may not position correctly on all devices or screen sizes due to variations in keyboard height and layout behavior across platforms
 - Server-side deletions are not propagated locally: if a task is removed directly from `db.json` while the app is running, it will reappear on the next sync (the app treats it as an offline-created task). Handling this would require a soft-delete mechanism on the server
 - Local storage capacity: the AsyncStorage cache can fill up. Each task serialized to JSON at maximum length weighs approximately **1,146 bytes (~1.12 KB)**, broken down as follows:
 
