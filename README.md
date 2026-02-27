@@ -72,7 +72,34 @@ Or try it live at [https://cardacci.github.io/CashDo](https://cardacci.github.io
 | @react-native-async-storage/async-storage | 2.2.0    | Local cache           |
 | react-native-web                          | ^0.21.0  | Web support           |
 | typescript                                | ~5.9.2   | Type safety           |
+| jest-expo _(dev)_                         | ~54.0.17 | Test framework preset |
 | json-server _(dev)_                       | ^1.0.0   | Mock REST API         |
+
+## Testing
+
+The project uses [Jest](https://jestjs.io/) with the [jest-expo](https://docs.expo.dev/develop/unit-testing/) preset for unit testing.
+
+### Running Tests
+
+```bash
+npm test              # Run all tests
+npx jest --watch      # Run in watch mode (re-runs on file changes)
+npx jest --coverage   # Run with coverage report
+```
+
+### Test Scope
+
+Unit tests cover stores, utilities, and services:
+
+| Area          | File                        | What is tested                                |
+| ------------- | --------------------------- | --------------------------------------------- |
+| **Stores**    | `useTaskStore.test.ts`      | Task CRUD, toggle, dark mode, API integration |
+|               | `useUndoStore.test.ts`      | Pending delete state management               |
+|               | `useErrorStore.test.ts`     | Error reporting with API cooldown logic       |
+| **Utilities** | `generateId.test.ts`        | UUID generation with fallback                 |
+|               | `formatDateTime.test.ts`    | Timestamp formatting                          |
+|               | `createSafeStorage.test.ts` | AsyncStorage wrapper with error reporting     |
+| **Services**  | `taskApi.test.ts`           | API functions with fetch mocking and timeout  |
 
 ## API Integration
 
@@ -180,7 +207,6 @@ Audited against the production build on [GitHub Pages](https://cardacci.github.i
 
 ## Known Limitations
 
-- No unit or integration tests (not required by the challenge, but planned for a future iteration)
 - Physical device testing requires manually updating the API base URL to the host machine's local IP
 - Server-side deletions are not propagated locally: if a task is removed directly from `db.json` while the app is running, it will reappear on the next sync (the app treats it as an offline-created task). Handling this would require a soft-delete mechanism on the server
 - Local storage capacity: the AsyncStorage cache can fill up. Each task serialized to JSON at maximum length weighs approximately **1,146 bytes (~1.12 KB)**, broken down as follows:
@@ -203,9 +229,10 @@ Audited against the production build on [GitHub Pages](https://cardacci.github.i
 
 ## Dev Features & DX
 
+- Unit tests for stores, utilities, and services (Jest + jest-expo)
 - All linter and Prettier rules passing
 - AI agent and developer coding guidelines configured via skills and project rules
-- GitHub Actions CI/CD pipeline: lint, build, and auto-deploy to [GitHub Pages](https://cardacci.github.io/CashDo/)
+- GitHub Actions CI/CD pipeline: lint, test, build, and auto-deploy to [GitHub Pages](https://cardacci.github.io/CashDo/)
 
 ## Roadmap
 
